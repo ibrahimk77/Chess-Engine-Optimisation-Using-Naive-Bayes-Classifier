@@ -1,10 +1,56 @@
 import chess
-
 # Create a new chess board
+
+class ChessGame:
+    def __init__(self):
+        self.board = chess.Board()  
+        self.board.set_fen("r1bqkbnr/pppppppp/2n2n2/3P4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 10")
+  
+
+    def fen_to_2d_array(self):
+        # Split the FEN string into board and metadata
+        fen = self.board.fen()
+        board_fen, _ = fen.split(' ', 1)  # We only need the board part
+
+        # Define mapping for FEN characters to two-letter piece codes
+        piece_mapping = {
+            'p': 'bp', 'n': 'bN', 'b': 'bB', 'r': 'bR', 'q': 'bQ', 'k': 'bK',
+            'P': 'wp', 'N': 'wN', 'B': 'wB', 'R': 'wR', 'Q': 'wQ', 'K': 'wK'
+        }
+
+        # Split rows of the board
+        rows = board_fen.split('/')
+
+        # Create a 2D array
+        board = []
+        for row in rows:
+            parsed_row = []
+            for char in row:
+                if char.isdigit():
+                    # Empty squares are represented by numbers in FEN
+                    parsed_row.extend(['--'] * int(char))
+                else:
+                    # Map FEN character to the two-letter piece code
+                    parsed_row.append(piece_mapping[char])
+            board.append(parsed_row)
+
+        return board
+
+
+
+
+
+
+
+
+
+
+
+
 board = chess.Board()
 
 board.set_fen("r1bqkbnr/pppppppp/2n2n2/3P4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 10")
-
+print(board)
 
 def evaluate_board(board):
     # Evaluate the board
@@ -25,7 +71,7 @@ def evaluate_board(board):
     return evaluation
 
 def alphaBetaMax(board, alpha, beta, depth):
-    if depth == 0:
+    if depth == 0 or board.is_game_over():
         return (evaluate_board(board),None)
     best_value = -float('inf')
     best_move = None
@@ -45,7 +91,7 @@ def alphaBetaMax(board, alpha, beta, depth):
 
 
 def alphaBetaMin(board, alpha, beta, depth):
-    if depth == 0:
+    if depth == 0 or board.is_game_over():
         return (-evaluate_board(board),None)
     best_value = float('inf')
     best_move = None
@@ -64,6 +110,15 @@ def alphaBetaMin(board, alpha, beta, depth):
     return (best_value, best_move)
 
 # Find the best move for white
-best_value, best_move = alphaBetaMax(board, -float('inf'), float('inf'), 6)
-print("Best move for white:", best_move, "with value:", best_value)
-    
+if board.turn == chess.WHITE:
+    best_value, best_move = alphaBetaMax(board, -float('inf'), float('inf'), 3)
+else:
+    best_value, best_move = alphaBetaMin(board, -float('inf'), float('inf'), 3)
+
+print("Best move:", best_move, "with value:", best_value)
+
+board.push(best_move)
+
+
+
+
