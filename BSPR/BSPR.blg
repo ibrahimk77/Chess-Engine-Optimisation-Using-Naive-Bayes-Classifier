@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: BSPR.aux
+Reallocating 'name_of_file' (item size: 1) to 7 items.
+The style file: ieeetr.bst
+Reallocating 'name_of_file' (item size: 1) to 4 items.
+Database file #1: PRJ.bib
+Warning--entry type for "NLPinChess" isn't style-file defined
+--line 56 of file PRJ.bib
+Warning--entry type for "plaatResearchReSearch2024" isn't style-file defined
+--line 73 of file PRJ.bib
+Warning--empty booktitle in xieResearchImprovementAlphaBeta2022
+Warning--empty publisher in xieResearchImprovementAlphaBeta2022
+Warning--empty year in xieResearchImprovementAlphaBeta2022
+Warning--empty booktitle in lowdNaiveBayesModels2005
+Warning--empty year in lowdNaiveBayesModels2005
+You've used 4 entries,
+            1876 wiz_defined-function locations,
+            493 strings with 4065 characters,
+and the built_in function-call counts, 637 in all, are:
+= -- 35
+> -- 37
+< -- 0
++ -- 14
+- -- 10
+* -- 43
+:= -- 98
+add.period$ -- 0
+call.type$ -- 4
+change.case$ -- 4
+chr.to.int$ -- 0
+cite$ -- 9
+duplicate$ -- 31
+empty$ -- 82
+format.name$ -- 10
+if$ -- 144
+int.to.chr$ -- 0
+int.to.str$ -- 4
+missing$ -- 2
+newline$ -- 15
+num.names$ -- 4
+pop$ -- 29
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 21
+stack$ -- 0
+substring$ -- 0
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 5
+while$ -- 4
+width$ -- 5
+write$ -- 26
+(There were 7 warnings)

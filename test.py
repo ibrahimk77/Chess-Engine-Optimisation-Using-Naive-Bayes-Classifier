@@ -10,8 +10,7 @@ DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
 IMAGES = {}
-STOCKFISH_PATH = "/stockfish"  # Path to the Stockfish engine
-
+STOCKFISH_PATH = "stockfish/stockfish-windows-x86-64-avx2.exe"  # Path to the Stockfish engine
 # Load images for the pieces
 def loadImages():
     pieces = ['wp', 'wN', 'wB', 'wR', 'wQ', 'wK', 'bp', 'bN', 'bB', 'bR', 'bQ', 'bK']
@@ -50,6 +49,7 @@ def main():
     loadImages()
     engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
     running = True
+    x = True
 
     while running:
         for e in p.event.get():
@@ -74,6 +74,9 @@ def main():
                 drawGame(screen, game)  # Redraw the board after each move
                 p.display.flip()
                 #time.sleep(1)
+        if x and game.board.is_game_over():
+            x = False
+            print(game.board.result())
 
 
         drawGame(screen, game)  # Redraw the board after each move
@@ -139,9 +142,9 @@ def evaluate_board(board):
 class ChessGame:
     def __init__(self):
         self.board = chess.Board()
-        self.board.set_fen(
-            "r1bqkbnr/pppppppp/2n2n2/3P4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 10"
-        )
+        # self.board.set_fen(
+        #     "r1bqkbnr/pppppppp/2n2n2/3P4/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 10"
+        # )
 
     def fen_to_2d_array(self):
         # Convert the FEN string into a 2D array for the board

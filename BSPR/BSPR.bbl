@@ -1,0 +1,17 @@
+\begin{thebibliography}{1}
+
+\bibitem{NLPinChess}
+I.~Kamlish, I.~B. Chocron, and N.~McCarthy, ``{{SentiMATE}}: {{Learning}} to
+  play {{Chess}} through {{Natural Language Processing}}.''
+
+\bibitem{xieResearchImprovementAlphaBeta2022}
+Y.~Xie, W.~Gao, Z.~Dai, and Y.~Li, ``Research and {{Improvement}} of
+  {{Alpha-Beta Search Algorithm}} in {{Gobang}},''
+
+\bibitem{plaatResearchReSearch2024}
+A.~Plaat, ``Research {{Re}}: Search \& {{Re-search}}.''
+
+\bibitem{lowdNaiveBayesModels2005}
+D.~Lowd and P.~Domingos, ``Naive {{Bayes}} models for probability estimation,''
+
+\end{thebibliography}
