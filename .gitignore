@@ -209,3 +209,11 @@ pip-selfcheck.json
 /venv
 chess_games.csv
 /stockfish
+BSPR/BSPR.aux
+BSPR/BSPR.bbl
+BSPR/BSPR.fdb_latexmk
+BSPR/BSPR.fls
+BSPR/BSPR.lof
+BSPR/BSPR.lot
+BSPR/BSPR.synctex.gz
+BSPR/BSPR.toc
