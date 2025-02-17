@@ -1,4 +1,21 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{davidsonShortHistoryChess2012}
+H.~A. Davidson, {\em A {{Short History}} of {{Chess}}}.
+\newblock Crown.
+
+\bibitem{averbakhHistoryChessChaturanga2012}
+Y.~Averbakh, {\em A {{History}} of {{Chess}}: {{From Chaturanga}} to the
+  {{Present Day}}}.
+\newblock SCB Distributors.
+
+\bibitem{hsuIBMsDeepBlue1999}
+F.-H. Hsu, ``{{IBM}}'s {{Deep Blue Chess}} grandmaster chips,'' vol.~19, no.~2,
+  pp.~70--81.
+
+\bibitem{shannonXXIIProgrammingComputer1950}
+C.~E. Shannon, ``{{XXII}}. {{Programming}} a computer for playing chess,''
+  vol.~41, no.~314, pp.~256--275.
 
 \bibitem{NLPinChess}
 I.~Kamlish, I.~B. Chocron, and N.~McCarthy, ``{{SentiMATE}}: {{Learning}} to
@@ -11,7 +28,42 @@ Y.~Xie, W.~Gao, Z.~Dai, and Y.~Li, ``Research and {{Improvement}} of
 \bibitem{plaatResearchReSearch2024}
 A.~Plaat, ``Research {{Re}}: Search \& {{Re-search}}.''
 
+\bibitem{kleinNeuralNetworksChess2022}
+D.~Klein, ``Neural {{Networks}} for {{Chess}}.''
+
+\bibitem{silverGeneralReinforcementLearning2018}
+D.~Silver, T.~Hubert, J.~Schrittwieser, I.~Antonoglou, M.~Lai, A.~Guez,
+  M.~Lanctot, L.~Sifre, D.~Kumaran, T.~Graepel, T.~Lillicrap, K.~Simonyan, and
+  D.~Hassabis, ``A general reinforcement learning algorithm that masters chess,
+  shogi, and {{Go}} through self-play,'' vol.~362, no.~6419, pp.~1140--1144.
+
 \bibitem{lowdNaiveBayesModels2005}
 D.~Lowd and P.~Domingos, ``Naive {{Bayes}} models for probability estimation,''
+
+\bibitem{eberhardtBayesianSpamDetection2015}
+J.~J. Eberhardt, ``Bayesian {{Spam Detection}},'' vol.~2, no.~1.
+
+\bibitem{departmentofcomputerscienceandengineeringjaypeeinstituteofinformationtechnologynoida201304indiaStatisticalAnalysisResult2018}
+{Department of Computer Science and Engineering, Jaypee Institute of
+  Information Technology, Noida, 201304, India}, P.~Lehana, S.~Kulshrestha,
+  N.~Thakur, and P.~Asthana, ``Statistical {{Analysis}} on {{Result
+  Prediction}} in {{Chess}},'' vol.~10, no.~4, pp.~25--32.
+
+\bibitem{guptaDeterminingChessPiece2023}
+A.~Gupta, C.~Grattoni, and A.~Gupta, ``Determining {{Chess Piece Values Using
+  Machine Learning}},'' vol.~12, no.~1.
+
+\bibitem{KingSafetyChessprogramming}
+``King {{Safety}} - {{Chessprogramming}} wiki.''
+
+\bibitem{PawnStructureChessprogramming}
+``Pawn {{Structure}} - {{Chessprogramming}} wiki.''
+
+\bibitem{PassedPawnChesscom}
+``Passed {{Pawn}} - {{Chess}}.com.''
+
+\bibitem{mikhalchishinCentreModernStrategy}
+A.~Mikhalchishin and G.~Mohr, {\em The {{Centre}}. {{A}} Modern Strategy
+  Guide}.
 
 \end{thebibliography}
