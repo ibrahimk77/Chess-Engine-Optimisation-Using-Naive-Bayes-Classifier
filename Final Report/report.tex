@@ -1,18 +1,25 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 6CCS3PRJ Final Year Individual Project Report
-% luke.day@kcl.ac.uk
+% mohammad.i.khan@kcl.ac.uk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[11pt]{informatics-report}
 \usepackage{color}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage[square,sort,comma,numbers]{natbib} %References
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Front Matter - project title, name, supervisor name and date
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{6CCS3PRJ Final Year\\\vspace{0.2cm}Individual Project Report Title}
-\author{Your Name}
-\studentID{000000}
+\author{Mohammad Ibrahim Khan}
+\studentID{k22013981}
 \supervisor{Name}
+
 
 \date{\today}
 
@@ -31,7 +38,24 @@
 % You can write each chapter directly here or in a separate .tex file and use the include command.
 
 \chapter{Introduction}
-This is one of the most important components of the report. It should begin with a clear statement of what the project is about so that the nature and scope of the project can be understood by a lay reader. It should summarise everything that you set out to achieve, provide a clear summary of the project's background and relevance to other work, and give pointers to the remaining sections of the report, which will contain the bulk of the technical material.
+??????""""This is one of the most important components of the report. It should begin with a clear statement of what the project is about so that the nature and scope of the project can be understood by a lay reader. It should summarise everything that you set out to achieve, provide a clear summary of the project's background and relevance to other work, and give pointers to the remaining sections of the report, which will contain the bulk of the technical material."""""????
+
+
+Since the creation of chess over 1500 years ago \cite{davidsonShortHistoryChess2012}, most agree that the biggest event in the games history was when IBM's Deep Blue defeated Kasparov \cite{hsuIBMsDeepBlue1999}, the world champion at the time. This was a turning point for chess engines and AI in general.
+Since then we have seen the rise of chess engines the likes of Stockfish and AlphaZero. Despite our progress in this field, the game is still unsolved. Shannon mentions there is $10^{120}$ possible positions in chess \cite{shannonXXIIProgrammingComputer1950} which is more than the number of atoms in the observable universe. Therefore, it is infeasible to brute force the game and since 1997, there have been attempts to create the perfect chess engine. Solving chess could be a pathway to solve other problems in computer science like Optimisation
+and Decision-Making. 
+
+Machine Learning is at the heart of modern chess engines like ??MENTION WHAT IS USED BY STOCKFISH OR ALPHAZERO AND QUOTE???. The aim of this project is to create a chess engine that uses machine learning techniques that aren't popular within the chess engine field, to explore the potential of these techniques but also to explore what processes can be shared between different machine learning techniques.
+Chess engines are usually used as a benchmark for advancements in AI, so this project could be a stepping stone for future research. 
+
+Minimax is a popular algorithm which is fundemental in chess engines. This, in conjuction with Alpha-Beta pruning, allows the engine to search through a game tree in order to find the best move. Due to the exponential growth of the game tree, its not feasible to searcht the entire tree. This is where machine learning is used to predict the best move in order to reduce the search space. Many techniques have been used from Neural Networks to Natural Language Process [REFERENCE]. ???GAPS???
+
+This research focusses on how a Naive Bayes Classifier can be implemented in a search algorithm like Minimax to improve positional evaluation in a chess engine. Naive Bayes has been see to be effective in other contexts like spam detection and due to its simplicity and efficiency, it could be ideal for this application. Popular machine learning algorithms used in chess engines are usually very complex and require a lot of computational power however Occams Razor states that simplicity is usually the best option. This research wants to see if this principle holds in this domain. 
+
+The standard minimax algorithm is limited by the evaluation function. Usually they only base themselves on piece values. However, chess has more intricacies that may not be seen at face value, including piece positions relative to each other as well as identifying weaknesses. This is where I hope a Naive Bayes classifier can be utilised to try to learn these intricacies better than a standard evaluation function.
+
+
+
 
 \section{Report Structure}
 
@@ -46,9 +70,10 @@ This is one of the most important components of the report. It should begin with
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % References
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bibliographystyle{plain}
+\bibliographystyle{ieeetr}
 \bibliography{references}
 \addcontentsline{toc}{section}{Bibliography}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Appendices

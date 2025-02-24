@@ -1,4 +1,42 @@
 \chapter{Background}
-The background should set the project into context by motivating the subject matter and relating it to existing published work. The background will include a critical evaluation of the existing literature in the area in which your project work is based and should lead the reader to understand how your work is motivated by and related to existing work.
+??????""""The background should set the project into context by motivating the subject matter and relating it to existing published work. The background will include a critical evaluation of the existing literature in the area in which your project work is based and should lead the reader to understand how your work is motivated by and related to existing work.
+""""????
+\section{Chess}
+Modern chess is a game that has its origins in India, dating back to the 6th century [REFERENCE] as a way of devising strategy and tactics in war. Today, this game is perceived as a benchmark for skill and intelligence, played by millions. Chess is an ideal candidate for AI research as it is a fully observable game, as both players can see everything related to the game state and the rules are well defined. Also there is no component of chance is the game, therefore the game state is only determined by the each players moves.
 
-\section{Section Heading}
+
+\section{Search Algorithms}
+The most popular way to design a chess engine is by using a search algorithm. Commonly used is what is known as minimax. The concept of minimax was first proposed by Shannon in 1950 [REFERENCE]. It is used for zero-sum games which are games where if one player wins, the other player loses. The algorithm recursively alternates between the maximising player and the minimising player, until it reaches a terminal node. Then the algorithm backtracks to find the best moves for each player. The algorithm is shown below:
+
+
+\begin{algorithm}[h]
+    \caption{Minimax Algorithm}
+    \begin{algorithmic}
+        \Function{Minimax}{Node, Depth, MaximizingPlayer}
+        \If{Depth = 0 or Node = Leaf}
+        \State \Return \Call{Eval}{Node}
+        \EndIf
+        \If{MaximizingPlayer}
+        \State $Value \gets -\infty$
+        \For{each  in Node}
+        \State $Value \gets \max(value, \textsc{Minimax}(\textit{child}, \textit{depth} - 1, \textbf{false}))$
+        \EndFor
+        \State \Return $Value$
+        \Else
+        \State $Value \gets \infty$
+        \For{each Child in Node}
+        \State $Value \gets \min(value, \textsc{Minimax}(\textit{child}, \textit{depth} - 1, \textbf{false}))$
+        \EndFor
+        \State \Return $Value$
+        \EndIf
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+The issue with this algorithm is that the search tree it creates grows exponentially, so techniques to decrease the search space are used. Alpha-Beta pruning is a one such technique that is used to reduce the number of nodes that need to be evaluated. It does this by ignoring nodes that would not affect the final outcome of the algorithm. It introduces two new values, ${\alpha}$ and ${\beta}$, where ${\alpha}$ represents the maximum value that can be attained and ${\beta}$ represents the minimum value that can be attained. If the value of a node is less than ${\alpha}$ or greater than ${\beta}$, then the node is pruned. In best case scenario the algorithm only needs to evaluate ${O(b^{m/2})}$ nodes \cite{russellArtificialIntelligenceModern2022}, where ${b}$ is the branching factor and ${d}$ is the depth of the tree compared to ${O(b^m)}$ nodes with normal minimax. However, in the worst case scenario it doesn't help improve minimax at all.
+
+However, even with alpha-beta pruning, the search space for chess is still too large to evaluate in a reasonable amount of time.  This is why a Heuristic Alpha-Beta Tree Search is used, which is where the search is cut off early and apply a heuristic evaluation function to estimate which player is in the winning position. In chess engines what is usually used for this evaluation function is calculating the material balance, where each piece is given a value and the player with the higher value is currently "winning".
+
+The way to improve chess is one of two ways. The first is to increase the depth of the search tree, however this is generally dependant on the computational power of the machine so over time as computational power increases (if Moore's Law still holds) the depth of the search tree can increase. The second way is to improve the evaluation function, which is what this research paper focusses on. The primary way this is done is by using machine learning techniques. 
+
+\section{Machine Learning}
+TEST
