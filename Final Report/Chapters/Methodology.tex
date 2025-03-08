@@ -1,0 +1,74 @@
+\chapter{Methodology}
+
+\section{Introduction}
+As mentioned previously, the focus of this paper is to explore the uses of Naive Bayes in chess and how this could impact other domains in computer science. This chapter will mention the methodology that was used to implement the Naive Bayes classifier in the chess engine. 
+
+\section{Random Chess Engine}
+??????Initially I wrote code to visualise the chess board. This makes it easier to to understand the game state and see what moves my chess engine would make. This makes it easier to understand my engine as well as debugging issues it may have. ????[SHOULD I INCLUDE THIS]
+
+I utilised the python-chess library to as a base to create my chess engine. The reason why I chose to use this library is because it has many features needed. This includes support for FEN notation, methods to get legal moves, and also I chode to use it due to the optimisations it uses including representing the board as a bitboard.
+
+Then I created a chess engine that randomly picks moves. This implementation was very simple due to python-chess' method \textit{board.legalmoves()} which provides all the legal moves avaialble to the current player. Using this list of moves, one is then chosen at random. The purpose of this random engine is be used as a benchmark for the main chess engine to be created.
+
+\section{MiniMax and Alpha-Beta pruning}
+Minimax is used by the majority of chess engines. The aim is to implement Naive Bayes to improve the minimax algorithm. So intuitivally the first step is implement minimax. Alpha-Beta is much more powerful than basic minimax as it will always give the same output as minimax and is much faster. Therefore, Alpha-Beta will be used directly. This is the pseudcode for the algorithm used. A similar method is use for alphaBetaMin.
+
+\begin{algorithm}[h]
+    \caption{Alpha-Beta Pruning Algorithm}
+    \begin{algorithmic}
+        \Function{AlphaBetaMax}{Board, Alpha, Beta, Depth}
+        \If{Depth = 0 or Game Over}
+            \State \Return \Call{Eval}{Board}, None
+        \EndIf
+        \State $BestValue \gets -\infty$
+        \State $BestMove \gets$ None
+
+        \For{each Move in legal\_moves}
+            \State \Call{MakeMove}{}
+            \State $Score \gets \textsc{AlphaBetaMin}(Board, Alpha, Beta, Depth - 1)[0]$
+            
+            \If{Score \textgreater \ BestValue}
+                \State $BestValue \gets Score$
+                \State $BestMove \gets Move$
+                \State $Alpha \gets \max(Alpha, Score)$
+            \EndIf
+            \If{Score \textgreater= Beta}
+                \State \textbf{break}
+            \EndIf
+        \EndFor
+        \State \Return $BestValue, BestMove$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+When using alpha-beta pruning, a depth of 3 was used. This was due to the limited computational power available. The depth of the search tree is the main thing that determines the performance of the chess engine. The higher the depth, the more possibilities the engine can explore which means each move made would have been given more consideration resulting in a better move.
+
+The other part of the minimax algorithm that is important is the evaluation function. This is what determines the moves that are made. It gives a value to a game state to approximate which player is winning at that point in time as it is infeasible to search the entire game tree. So the evaluation function is used to estimate the winner at a certain point in the game. The evaluation function used for the purpose of this project will be very simple and will be mainly based on material balance. This is a good indicator of the current state of the game as generally the more pieces a player has the more options they have, therefore they are more likely to win.
+
+\begin{equation}
+    \label{eq:material}
+    \text{Material Balance} = \text{Number of White Pieces} - \text{Number of Black Pieces} 
+\end{equation}
+
+
+However, considering each piece of equal value is not representative of the true value of pieces during the game. For example 1 queen is worth more than 2 pawns. Therfore, this research will use the values in Table~\ref{tab:values} to calculate the material balance, which are the commonly accepted values for each piece \cite{guptaDeterminingChessPiece2023}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Piece} & \textbf{Value} \\
+        \hline
+        Pawn & 1 \\
+        Knight & 3 \\
+        Bishop & 3 \\
+        Rook & 5 \\
+        Queen & 9 \\
+        King & 0 \\
+        \hline
+    \end{tabular}
+    \caption{Values of Chess Pieces}
+    \label{tab:values}
+\end{table}
+
+This evaluation function is relatively strong and incentivises the engine to take pieces when possible and also to protect its own pieces. However, closer to the end game the evaluation function doesn't help the engine know how to win. The evaluations function should also give values to end game positions like checkmate. Also the evaluation function should incentivise the engine to check the opponent as well. Therefore we consider checkmates to be terminal nodes and give them a value of $\pm \infty$ dependant on who is winnning as well as a value of 10

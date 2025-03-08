@@ -38,5 +38,19 @@ However, even with alpha-beta pruning, the search space for chess is still too l
 
 The way to improve chess is one of two ways. The first is to increase the depth of the search tree, however this is generally dependant on the computational power of the machine so over time as computational power increases (if Moore's Law still holds) the depth of the search tree can increase. The second way is to improve the evaluation function, which is what this research paper focusses on. The primary way this is done is by using machine learning techniques. 
 
-\section{Machine Learning}
-TEST
+\section{Naive Bayes}
+The most well-known chess engines are Stockfish and AlphaZero. AlphaZero, designed by DeepMind, uses a deep neural network in conjunction with reinforcement learning which allows it to teach itself how to play. Initially it has no understanding of the game other than the basic rules, then it plays against itself and uses the result of the game to update parameters in the neural network. Stockfish however uses a more traditional approach, utilising alpha-beta pruning with minimax with a evalutaion function that is based on numerous elements of the game. Recently it has also implemented a neural network to improve its evaluation function. However both these engines require a lot of computational power and also require a large dataset to generalise well, whereas Naive Bayes is a much simpler algorithm that requires less power and can generalise well even with a small dataset. This is the reason why this paper is concentrated on observing the impact of Naive Bayes on chess. This is because it is very simple and makes assumptions that are generally unrealistic, however it has been shown to be effective in domains like spam detection \cite{eberhardtBayesianSpamDetection2015} despite the simplistic assumptions. [MENTION SOMEWHERE THAT IS THE WORST CLASSIFIER IN HEAD TO HEAD COMPARISON]
+
+Naive Bayes, sometimes also known as Idiot Bayes or Simple Bayes, is a simple classification algorithm that is based upon Bayes' theorem (Equation~\ref{eq:bayestheorem}) \cite{lowdNaiveBayesModels2005}. 
+
+\begin{equation}
+    \label{eq:bayestheorem}
+    P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+\end{equation}
+
+It is referred to as naive as it assumes each input variable $X_1, X_2,..., X_n $ is conditionally independant given the class. Despite this assumption not being true in most cases, it still performs well in practise. This assumption allows probability distributions to be efficiently represented as the product of the individual probabilities of the the input variables (Equation~\ref{eq:naivebayes}) \cite{lowdNaiveBayesModels2005}.
+
+\begin{equation}
+\label{eq:naivebayes}
+P(X_1, X_2, ..., X_n, C) ={P(C)}\cdot \prod_{i=1}^{n}{P(X_i | C)}
+\end{equation}
