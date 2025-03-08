@@ -209,6 +209,7 @@ pip-selfcheck.json
 /venv
 chess_games.csv
 /stockfish
+/actual/stockfish
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/latex
