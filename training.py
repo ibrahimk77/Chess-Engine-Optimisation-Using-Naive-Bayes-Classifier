@@ -46,46 +46,46 @@ def naive_bayes_categorical(df, X, Y):
 
 
 
-# def calculate_likelihood_gaussian(df, feat_name, feat_val, Y, label):
-#     feat = list(df.columns)
-#     df = df[df[Y]==label]
-#     mean, std = df[feat_name].mean(), df[feat_name].std()
-#     p_x_given_y = (1 / (np.sqrt(2 * np.pi) * std)) * np.exp(-((feat_val-mean)**2 / (2 * std**2 )))
-#     return p_x_given_y
+def calculate_likelihood_gaussian(df, feat_name, feat_val, Y, label):
+    feat = list(df.columns)
+    df = df[df[Y]==label]
+    mean, std = df[feat_name].mean(), df[feat_name].std()
+    p_x_given_y = (1 / (np.sqrt(2 * np.pi) * std)) * np.exp(-((feat_val-mean)**2 / (2 * std**2 )))
+    return p_x_given_y
 
 
-# def naive_bayes_guassian(df, X, Y):
+def naive_bayes_guassian(df, X, Y):
 
-#     features = list(df.columns)[:-1]
+    features = list(df.columns)[:-1]
 
-#     prior = calculate_prior(df, Y)
+    prior = calculate_prior(df, Y)
 
-#     Y_pred = []
+    Y_pred = []
 
-#     for x in X:
-#         labels = sorted(list(df[Y].unique()))
-#         likelihood = [1] * len(labels)
-#         for j in range(len(labels)):
-#             for i in range(len(features)):
-#                 likelihood[j] *= calculate_likelihood_gaussian(df, features[i], x[i], Y, labels[j])
+    for x in X:
+        labels = sorted(list(df[Y].unique()))
+        likelihood = [1] * len(labels)
+        for j in range(len(labels)):
+            for i in range(len(features)):
+                likelihood[j] *= calculate_likelihood_gaussian(df, features[i], x[i], Y, labels[j])
         
-#         post_prob = [1]*len(labels)
-#         for j in range(len(labels)):
-#             post_prob[j] = likelihood[j] * prior[j]
+        post_prob = [1]*len(labels)
+        for j in range(len(labels)):
+            post_prob[j] = likelihood[j] * prior[j]
         
-#         Y_pred.append(labels[np.argmax(post_prob)])
+        Y_pred.append(labels[np.argmax(post_prob)])
 
-#     return np.array(Y_pred)
+    return np.array(Y_pred)
 
 
 
 data = pd.read_csv('chess_games_features.csv')
 
-category_mapping = {'1-0': 0, '0-1': 1, '1/2-1/2': 2}
-data['result_encoded'] = data['result'].map(category_mapping)
+# category_mapping = {'1-0': 0, '0-1': 1, '1/2-1/2': 2}
+# data['result_encoded'] = data['result'].map(category_mapping)
 
 
-data = data[["material_balance", "result_encoded"]]
+# data = data[["material_balance", "result_encoded"]]
 
 
 
@@ -93,14 +93,14 @@ train, test = train_test_split(data, test_size=0.2)
 
 X_test = test.iloc[:,:-1].values
 Y_test = test.iloc[:,-1].values
-Y_pred = naive_bayes_categorical(train, X=X_test, Y='result_encoded')
+Y_pred = naive_bayes_guassian(train, X=X_test, Y='result')
 
 print(confusion_matrix(Y_test, Y_pred))
 print('F1 Score: ', f1_score(Y_test, Y_pred, average='weighted'))
 
 # Check the distribution of the 'result' column in the training and test sets
-print(train['result_encoded'].value_counts())
-print(test['result_encoded'].value_counts())
+print(train['result'].value_counts())
+print(test['result'].value_counts())
 
 
 

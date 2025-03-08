@@ -49,3 +49,16 @@ def control_of_center_large(board):
     return white_pieces - black_pieces
 
 
+def king_attack_balance(board):
+    #positive = white under attack
+    #negative = black under attack
+    w_king_square = board.king(chess.WHITE)
+    b_king_square = board.king(chess.BLACK)
+
+    w_attackers = board.attackers(chess.BLACK, w_king_square)
+    b_attackers = board.attackers(chess.WHITE, b_king_square)
+
+    return len(w_attackers) - len(b_attackers)
+    
+def king_position(board):
+    pass

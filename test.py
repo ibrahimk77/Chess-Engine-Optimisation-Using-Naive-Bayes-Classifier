@@ -3,6 +3,7 @@ import chess
 import chess.engine
 from chess_engine import ChessGame
 import time
+import random
 
 # Constants for the board and pieces
 WIDTH = HEIGHT = 512
@@ -11,6 +12,8 @@ SQ_SIZE = HEIGHT // DIMENSION
 MAX_FPS = 15
 IMAGES = {}
 STOCKFISH_PATH = "stockfish/stockfish-windows-x86-64-avx2.exe"  # Path to the Stockfish engine
+
+
 # Load images for the pieces
 def loadImages():
     pieces = ['wp', 'wN', 'wB', 'wR', 'wQ', 'wK', 'bp', 'bN', 'bB', 'bR', 'bQ', 'bK']
@@ -48,8 +51,10 @@ def main():
     game = ChessGame()  # Initialize your custom ChessGame class
     loadImages()
     engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    engine.configure({"Skill Level": 1})
     running = True
     x = True
+    moved = True
 
     while running:
         for e in p.event.get():
@@ -58,11 +63,15 @@ def main():
 
         # AI makes a move and updates the board
         if not game.board.is_game_over():
-            if game.board.turn == chess.WHITE:
-                best_value, best_move = alphaBetaMax(game.board, -float("inf"), float("inf"), 5)
+            if game.board.turn == chess.BLACK:
+                #best_move = random.choice(list(game.board.legal_moves))
+                best_value, best_move = alphaBetaMin(game.board, -float("inf"), float("inf"), 4)
             else:
-                result = engine.play(game.board, chess.engine.Limit(time=1))
-                best_move = result.move
+                #result = engine.play(game.board, chess.engine.Limit(time=1))
+                #best_move = result.move
+                best_move = random.choice(list(game.board.legal_moves))
+                #best_value, best_move = alphaBetaMax(game.board, -float("inf"), float("inf"), 3)
+
             # best_value, best_move = (
             #     alphaBetaMax(game.board, -float("inf"), float("inf"), 5)
             #     if game.board.turn == chess.WHITE
@@ -70,19 +79,23 @@ def main():
             # )
             if best_move:
                 game.board.push(best_move)  # Update the board with the best move
-
                 drawGame(screen, game)  # Redraw the board after each move
                 p.display.flip()
+
                 #time.sleep(1)
-        if x and game.board.is_game_over():
+        elif x:
+            print("TEST")
             x = False
             print(game.board.result())
 
+        # if moved:
+        #     drawGame(screen, game)  # Redraw the board after each move
+        #     p.display.flip()
+        #     moved = False
 
-        drawGame(screen, game)  # Redraw the board after each move
         clock.tick(MAX_FPS)
-        p.display.flip()
 
+    engine.quit()
 # Alpha-beta pruning functions
 def alphaBetaMax(board, alpha, beta, depth):
     if depth == 0 or board.is_game_over():
@@ -94,17 +107,19 @@ def alphaBetaMax(board, alpha, beta, depth):
         board.push(move)
         score = alphaBetaMin(board, alpha, beta, depth - 1)[0]
         board.pop()
+
         if score > best_value:
             best_value = score
             best_move = move
             alpha = max(alpha, score)
         if score >= beta:
             break
-    return (best_value, best_move)
+    return (best_value, best_move if best_move else random.choice(list(board.legal_moves)))
 
 def alphaBetaMin(board, alpha, beta, depth):
     if depth == 0 or board.is_game_over():
         return (-evaluate_board(board), None)
+
     best_value = float("inf")
     best_move = None
 
@@ -112,13 +127,14 @@ def alphaBetaMin(board, alpha, beta, depth):
         board.push(move)
         score = alphaBetaMax(board, alpha, beta, depth - 1)[0]
         board.pop()
+
         if score < best_value:
             best_value = score
             best_move = move
             beta = min(beta, score)
         if score <= alpha:
             break
-    return (best_value, best_move)
+    return (best_value, best_move if best_move else random.choice(list(board.legal_moves)))
 
 def evaluate_board(board):
     # Evaluate the board
@@ -135,6 +151,18 @@ def evaluate_board(board):
     for piece_type in piece_values:
         evaluation += len(board.pieces(piece_type, chess.WHITE)) * piece_values[piece_type]
         evaluation -= len(board.pieces(piece_type, chess.BLACK)) * piece_values[piece_type]
+    
+    if board.is_checkmate():
+        if board.turn == chess.WHITE:
+            evaluation = -float("inf")
+        else:
+            evaluation = float("inf")
+    
+    # if board.is_check():
+    #     if board.turn == chess.WHITE:
+    #         evaluation -= 4
+    #     else:
+    #         evaluation += 4
 
     return evaluation
 
@@ -166,5 +194,44 @@ class ChessGame:
             board.append(parsed_row)
         return board
 
+
+
+def main_no_board():
+    game = ChessGame()  # Initialize your custom ChessGame class
+    engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    running = True
+    x = True
+    moved = True
+
+    while running:
+        # AI makes a move and updates the board
+        if not game.board.is_game_over():
+            if game.board.turn == chess.BLACK:
+                best_value, best_move = alphaBetaMax(game.board, -float("inf"), float("inf"), 5)
+            else:
+                #result = engine.play(game.board, chess.engine.Limit(time=1))
+                #best_move = result.move
+                best_move = random.choice(list(game.board.legal_moves))
+            # best_value, best_move = (
+            #     alphaBetaMax(game.board, -float("inf"), float("inf"), 5)
+            #     if game.board.turn == chess.WHITE
+            #     else alphaBetaMin(game.board, -float("inf"), float("inf"), 5)
+            # )
+            if best_move:
+                game.board.push(best_move)  # Update the board with the best move
+
+        if x and game.board.is_game_over():
+            x = False
+            number_black_pieces = board.occupied_co[chess.BLACK]
+            number_white_pieces = board.occupied_co[chess.WHITE]
+            print("Number of black pieces: ", number_black_pieces)
+            print("Number of white pieces: ", number_white_pieces)
+            print(game.board.result())
+
+    engine.quit()
+
+
 # Run the main program
 main()
+
+
