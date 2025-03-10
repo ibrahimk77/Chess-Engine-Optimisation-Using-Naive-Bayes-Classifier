@@ -153,3 +153,54 @@ After collecting all the features, I standardised the data. This is because the 
 \end{itemize}
 
 This allows all the features to have a mean of 0 and a standard deviation of 1 but also keep the original distribution of the data.
+
+
+\section{Naive Bayes Classifier}
+
+The Naive Bayes Classifier is a simple classifier that is based on Bayes' Theorem. Bayes' theorem is a fundemental principle that describes how the new evidence can change the probability of an event. Bayes' Theorem is given by the following equation:
+
+\begin{equation}
+    \label{eq:bayes}
+    P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $P(A|B)$: Posterior probability
+    \item $P(B|A)$: Likelihood
+    \item $P(A)$: Prior probability
+    \item $P(B)$: Evidence probability 
+\end{itemize}
+
+Posterior probabilty is the probability of event A happening after knowing new evidence B. Likelihood is the probability of evidence B happening given that event A is true. Prior probability is the probabilty of event we intiially know about A before any new evidence. 
+
+The first step for implementing Naive Bayes is to calculate the prior probabilities of each class. This is calculated by going through the whole dataset and working out the proportion of each class. This is done by the following formula:
+
+\begin{equation}
+    \label{eq:prior}
+    P(C) = \frac{N_c}{N}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $P(C)$: Prior probability of class C
+    \item $N_c$: Number of instances of class C
+    \item $N$: Total number of instances
+\end{itemize}
+
+The next step is to calculate the likelihood of each feature given the class. Ther are two main type of Naive Bayes classifiers, Gaussian and Multinomial. Multinomial is used for discrete features, calcluating the likelihood based on the count of each feature. 
+
+\begin{equation}
+    \label{eq:multinomial}
+    P(X | C) = \frac{N_{X,C} + 1}{N_C + V}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $N_{X,C}$: Number of instances of the feature $X$ in class $C$
+    \item $1$: Laplace smoothing constant
+    \item $N_C$: Number of instances in class $C$
+    \item $V$: Number of possible values for $X$
+\end{itemize}
+
+However, most of the features used in this project are continuous so Guassian Naive Bayes is more ideal. 
