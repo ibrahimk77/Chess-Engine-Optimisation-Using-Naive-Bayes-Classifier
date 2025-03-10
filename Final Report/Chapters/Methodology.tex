@@ -6,13 +6,13 @@ As mentioned previously, the focus of this paper is to explore the uses of Naive
 \section{Random Chess Engine}
 ??????Initially I wrote code to visualise the chess board. This makes it easier to to understand the game state and see what moves my chess engine would make. This makes it easier to understand my engine as well as debugging issues it may have. ????[SHOULD I INCLUDE THIS]
 
-I utilised the python-chess library to as a base to create my chess engine. The reason why I chose to use this library is because it has many features needed. This includes support for FEN notation, methods to get legal moves, and also I chode to use it due to the optimisations it uses including representing the board as a bitboard.
+I utilised the python-chess library to as a base to create my chess engine. The reason why I chose to use this library is because it has many features needed. This includes support for FEN notation, methods to get legal moves, and also I chose to use it due to the optimisations it uses including representing the board as a bitboard.
 
-Then I created a chess engine that randomly picks moves. This implementation was very simple due to python-chess' method \textit{board.legalmoves()} which provides all the legal moves avaialble to the current player. Using this list of moves, one is then chosen at random. The purpose of this random engine is be used as a benchmark for the main chess engine to be created.
+Then I created a chess engine that randomly picks moves. This implementation was very simple due to python-chess' method \textit{board.legalmoves()} which provides all the legal moves available to the current player. Using this list of moves, one is then chosen at random. The purpose of this random engine is be used as a benchmark for the main chess engine to be created.
 
 \section{MiniMax and Alpha-Beta pruning}
-Minimax is used by the majority of chess engines. The aim is to implement Naive Bayes to improve the minimax algorithm. So intuitivally the first step is implement minimax. Alpha-Beta is much more powerful than basic minimax as it will always give the same output as minimax and is much faster. Therefore, Alpha-Beta will be used directly. This is the pseudcode for the algorithm used. A similar method is use for alphaBetaMin.
-
+Minimax is used by the majority of chess engines. The aim is to implement Naive Bayes to improve the minimax algorithm. So intuitively the first step is implement minimax. Alpha-Beta is much more powerful than basic minimax as it will always give the same output as minimax and is much faster. Therefore, Alpha-Beta will be used directly. This is the pseudocode for the algorithm used. A similar method is use for alphaBetaMin.
+????UPDATE pseudocode???
 \begin{algorithm}[h]
     \caption{Alpha-Beta Pruning Algorithm}
     \begin{algorithmic}
@@ -51,7 +51,7 @@ The other part of the minimax algorithm that is important is the evaluation func
 \end{equation}
 
 
-However, considering each piece of equal value is not representative of the true value of pieces during the game. For example 1 queen is worth more than 2 pawns. Therfore, this research will use the values in Table~\ref{tab:values} to calculate the material balance, which are the commonly accepted values for each piece \cite{guptaDeterminingChessPiece2023}.
+However, considering each piece of equal value is not representative of the true value of pieces during the game. For example 1 queen is worth more than 2 pawns. Therefore, this research will use the values in Table~\ref{tab:values} to calculate the material balance, which are the commonly accepted values for each piece \cite{guptaDeterminingChessPiece2023}.
 
 \begin{table}[h]
     \centering
@@ -59,11 +59,11 @@ However, considering each piece of equal value is not representative of the true
         \hline
         \textbf{Piece} & \textbf{Value} \\
         \hline
-        Pawn & 1 \\
-        Knight & 3 \\
-        Bishop & 3 \\
-        Rook & 5 \\
-        Queen & 9 \\
+        Pawn & 100 \\
+        Knight & 300 \\
+        Bishop & 300 \\
+        Rook & 500 \\
+        Queen & 900 \\
         King & 0 \\
         \hline
     \end{tabular}
@@ -71,4 +71,85 @@ However, considering each piece of equal value is not representative of the true
     \label{tab:values}
 \end{table}
 
-This evaluation function is relatively strong and incentivises the engine to take pieces when possible and also to protect its own pieces. However, closer to the end game the evaluation function doesn't help the engine know how to win. The evaluations function should also give values to end game positions like checkmate. Also the evaluation function should incentivise the engine to check the opponent as well. Therefore we consider checkmates to be terminal nodes and give them a value of $\pm \infty$ dependant on who is winnning as well as a value of 10
+This evaluation function is relatively strong and incentivises the engine to take pieces when possible and also to protect its own pieces. After testing this evaluation function, as expected, the engine was winning initially by taking pieces. However, it never won against the random engine. After analysing the games played, the problem was in the end game. I realised that the evaluation function did not incentivise the engine to check the opponent, which is the most important part of chess. Therefore, checkmates were considered terminal nodes by giving them a value of $\pm \infty$ dependant on who is winning. A value of 10 was also given to check as this is a very strong move. This was then the ???final??? evaluataion function used.
+
+
+\section{Data Collection}
+
+The choice of dataset used for the Naive Bayes Classifier was an important task to ensure the classifier had enough data to be trained on but also have good data to be trained on. There were many datasets that I came across. In the end, I chose to use a dataset from kaggle.com [REFERENCE] which had 6.25 million chess games played on lichess.com in July 2016 . This gave me a lot of flexibility as there is a lot of data to train on. There were other datasets like a set of 4 million games on chess.com only played with grandmaster players. However, I wanted to train a model to work for all level of platers so I chose tp go with the lichess dataset. 
+
+The lichess dataset was in csv format. These are the features that were part of the dataset:
+
+\begin{itemize}
+    \item \textbf{Event:} The type of game.
+    \item \textbf{White:} White's ID.
+    \item \textbf{Black:} Black's ID.
+    \item \textbf{Result:} The outcome of the game (\texttt{1--0} if White wins, \texttt{0--1} if Black wins and \texttt{1/2--1/2} if they draw).
+    \item \textbf{UTCDate, UTCTime:} The date and time (UTC) when the game was played.
+    \item \textbf{WhiteElo, BlackElo:} ELO of the players.
+    \item \textbf{WhiteRatingDiff, BlackRatingDiff:} The change in rating points after the game.
+    \item \textbf{ECO:} Opening in ECO (Encyclopaedia of Chess Openings) encoding,
+    \item \textbf{Opening:} Opening name.
+    \item \textbf{TimeControl:} The time allocated for each player, plus any increment in seconds.
+    \item \textbf{Termination:} The reason the game concluded.
+    \item \textbf{AN (Algebraic Notation):} The sequence of moves in algebraic notation.
+\end{itemize}
+
+A lot of the features would not be very useful to train the model. The ID's of the players would not be useful to train with so was discarded. The UTCDate, UTCTime also would not be useful as the time of day a game is played wouldn't affect the outcome of the game or to decide the best move to make. The Elo ratings of the players would be useful as players of similar levels may play in similar ways however this also wasn't used as this information won't always be available when using the engine. The way the game terminated is also information that wouldn't be beneficial as all that is important is the final game result. The most important features that was utilised was the result of the game and the sequence of moves in algebraic notation.
+
+The data then needed to be preprocessed. The moves in algebraic notation needed to be converted in a format that can be used by the Naive Bayes Classifier. For each game, I used the python-chess library to simulate the game, so for each move the board is updated. However using every move would be too much data to train on, especially since consecutive moves are highly correlated. Therefore, for most of the game I use every 6 moves however during end game, I use every other move. This is because during the end game, each move will most likely have a bigger impact on the result of the game. For the purpose of this project, end game is after 75\% of the moves have been made. We also make sure that the last move is included in the data as well since this is the game state that determined the result of the game.
+
+\section{Feature Selection}
+
+Material balance is the first feature implemented. Arguably this is the most important feature to estimate the current state of a chess game. For the purpose of this project, the values in Table~\ref{tab:values} were used to calculate the material balance, using Equation~\ref{eq:material}. The material balance is positive if the values of White's pieces are grater than the values of Black's pieces and vice versa.
+\begin{equation}
+    \label{eq:material}
+    \text{Material Balance} = \text{Number of White Pieces} - \text{Number of Black Pieces} 
+\end{equation}
+
+Another feature used is the positional value of pieces. The location of specific pieces on the board can influence how effective it is within the game. An example of a piece position table is given in Table~\ref{tab:knight_positional_values} to calculate the positional value of a knight.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{} & \textbf{A} & \textbf{B} & \textbf{C} & \textbf{D} & \textbf{E} & \textbf{F} & \textbf{G} & \textbf{H} \\
+        \hline
+        \textbf{8} & -50 & -40 & -30 & -30 & -30 & -30 & -40 & -50 \\
+        \textbf{7} & -40 & -20 & 0 & 5 & 5 & 0 & -20 & -40 \\
+        \textbf{6} & -30 & 0 & 10 & 15 & 15 & 10 & 0 & -30 \\
+        \textbf{5} & -30 & 5 & 15 & 20 & 20 & 15 & 5 & -30 \\
+        \textbf{4} & -30 & 0 & 15 & 20 & 20 & 15 & 0 & -30 \\
+        \textbf{3} & -30 & 5 & 10 & 15 & 15 & 10 & 5 & -30 \\
+        \textbf{2} & -40 & -20 & 0 & 5 & 5 & 0 & -20 & -40 \\
+        \textbf{1} & -50 & -40 & -30 & -30 & -30 & -30 & -40 & -50 \\
+        \hline
+    \end{tabular}
+    \caption{Positional Value Table for Knight}
+    \label{tab:knight_positional_values}
+\end{table}
+
+This table favours the knight to be in the centre of the board rather than the edge. This is because when the knight is in the centre it can control more squares and has more options whereas when it is near the edge, the knight is much more restricted, especially the corners where they have only 2 possible moves. Another example are pawns which are also more valuable in the centre of the board but also in squares that are close to promotion. They are usually not effective in the starting ranks. The positional values of all the black pieces are then summed up and subtracted from the sum of the positional values of the white pieces.
+
+Another feature considered for the Naive Bayes Classifier is piece mobility. Piece mobility is the possible moves a piece can make. Generally the more moves available to a player, the more control they can have over the board. This is calculated as the difference between the number of legal moves White has and the number of legal moves Black has.
+
+King Safety is another feature that is critical to the game. The winning or losing of the game solely lies upon how well you cant protect the king. There are many ways to define king safety. In this project, we will use the amount of pieces that are attacking the king. This is an important factor to consider since, the more pieces attacking the king, the more likely the player is to lose.
+
+Structure of pawns was also considered as a feature. The structure of pawns can determine how much control the player has, defending its pieces and preventing advancements from the enemy. The two that were considered was isolated pawns and doubled pawns. Isolated pawns are pawns that do not have any friendly pawns on adjacent files. Usually this is a weak structure since they can't be defended by other pawns and also can be easily blocked by the opponent pieces however they can be considered strong in some cases. This is because they can have more control over the board but also some openings use isolated pawns in order to allow more movement for rooks and bishops. Doubled pawns are pawns that are on the same file. Generally this is a weak structure since they are limiting each other's mobility and can generally become isolated. However creating doubled pawns can be used to open up files or diagonals for rooks and bishops.
+
+The last feature considered is the castling rights of the player. Castling is a move that allows the king to move two squares towards a rook. This is a very strong move as it allows the king to move away from the centre which is generally more dangerous. It also allows the rook to have a more active role in the game. Whether the play has castling rights both kingside and queenside are considered. 
+
+After collecting all the features, I standardised the data. This is because the features are on different scales so it's important to normalise the data to ensure the Naive Bayes Classifier is trained properly and doesn't give importance to features that are on a larger scale. I utilised the StandardScaler from the scikit-learn library. This is done by the following formula:
+
+\begin{equation}
+    \label{eq:standardisation}
+    z = \frac{x - \mu}{\sigma}
+\end{equation}
+
+\begin{itemize}
+    \item $x$: Feature value
+    \item $\mu$: Mean of the feature
+    \item $\sigma$: Standard deviation of the feature
+\end{itemize}
+
+This allows all the features to have a mean of 0 and a standard deviation of 1 but also keep the original distribution of the data.
