@@ -2,6 +2,7 @@ import pandas as pd
 import chess 
 import re
 from features import board_features
+import time
 
 
 def an_to_moves(an):
@@ -11,7 +12,7 @@ def an_to_moves(an):
     moves_list = moves.split()
     return moves_list
 
-def features_from_AN(an, result):
+def features_from_AN(an, result, model_num):
 
     moves = an_to_moves(an)
     board = chess.Board()
@@ -47,7 +48,7 @@ def features_from_AN(an, result):
     
         if extract: # or i == len(moves) - 1:
             
-            features = board_features(board)
+            features = board_features(board, model_num)
             features['result'] = result
             features_at_intervals.append(features)
     
@@ -55,23 +56,35 @@ def features_from_AN(an, result):
 
 
 
-def preprocess_data(input_file, output_file):
+def preprocess_data(input_file, output_file, i):
 
     df = pd.read_csv(input_file)
 
     all_features = []
+    
+    total_time = 0
+    values = 0
 
     for index, row in df.iterrows():
+        start = time.time()
         if row['Result'] == '1/2-1/2': #TODO:Remove draws for now 
             continue
-        features = features_from_AN(row['AN'], row['Result'])
+        features = features_from_AN(row['AN'], row['Result'], i)
         all_features.extend(features)
+        end = time.time()
+        total_time += end - start
+        values += 1
     
     new_df = pd.DataFrame(all_features)
     new_df.to_csv(output_file, index=False)
-        
-preprocess_data('chess_games_10k.csv', 'chess_games_features.csv')
+    print(f"Average time taken for each move: {total_time/values}")
 
+def preprocess_data_4():
+    for i in range(4):
+        preprocess_data(f'chess_games_100k.csv', f'chess_games_features_{i}.csv', i)
+        
+#preprocess_data('chess_games_10k.csv', 'chess_games_features.csv', 1)
+preprocess_data_4()
 
 
 

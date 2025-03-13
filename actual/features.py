@@ -1,6 +1,5 @@
 import chess
 
-
 PIECE_VALUES = {
     chess.PAWN: 100,
     chess.KNIGHT: 300,
@@ -65,17 +64,6 @@ KING_POSITION_TABLE = [
     [20, 20, 10, 10, 10, 10, 20, 20]
 ]
 
-#TODO: King position in endgame
-#TODO: Consider other features
-
-
-
-
-
-
-
-
-
 def calculate_material_balance(board):
     material_white = sum(PIECE_VALUES[piece] * len(board.pieces(piece, chess.WHITE)) for piece in PIECE_VALUES)
     material_black = sum(PIECE_VALUES[piece] * len(board.pieces(piece, chess.BLACK)) for piece in PIECE_VALUES)
@@ -83,77 +71,51 @@ def calculate_material_balance(board):
 
 def piece_mobility(board):
     player = board.turn
-
-    count = sum(1 for _ in board.legal_moves)
-    board.turn = not player
-    count -= sum(1 for _ in board.legal_moves)
-
-    board.turn = player
-
+    player_moves = board.legal_moves.count()
+    board_copy = board.copy(stack=False)
+    board_copy.turn = not player
+    opponent_moves = board_copy.legal_moves.count()
+    mobility = player_moves - opponent_moves
     if player == chess.BLACK:
-        count = -count
-    
-    return count
+        mobility = -mobility
+    return mobility
 
 def control_of_center_small(board):
     center_squares = [chess.E4, chess.D4, chess.E5, chess.D5]
-    
     white_pieces = sum(10 for square in center_squares 
-                      if board.piece_at(square) 
-                      and board.piece_at(square).color == chess.WHITE)
-    
+                       if board.piece_at(square) and board.piece_at(square).color == chess.WHITE)
     black_pieces = sum(10 for square in center_squares 
-                      if board.piece_at(square) 
-                      and board.piece_at(square).color == chess.BLACK)
-    
+                       if board.piece_at(square) and board.piece_at(square).color == chess.BLACK)
     return white_pieces - black_pieces
 
 def control_of_center_large(board):
     center_squares = [
         chess.E4, chess.D4, chess.E5, chess.D5,  # Inner center
         chess.C3, chess.D3, chess.E3, chess.F3,  # Rank 3
-        chess.C4, chess.F4, chess.C5, chess.F5,  # Files c,f
+        chess.C4, chess.F4, chess.C5, chess.F5,  # Files c, f
         chess.C6, chess.D6, chess.E6, chess.F6   # Rank 6
     ]
-    
     white_pieces = sum(10 for square in center_squares 
-                      if board.piece_at(square) 
-                      and board.piece_at(square).color == chess.WHITE)
-    
+                       if board.piece_at(square) and board.piece_at(square).color == chess.WHITE)
     black_pieces = sum(10 for square in center_squares 
-                      if board.piece_at(square) 
-                      and board.piece_at(square).color == chess.BLACK)
-    
+                       if board.piece_at(square) and board.piece_at(square).color == chess.BLACK)
     return white_pieces - black_pieces
 
 def king_attack_balance(board):
-    #positive = white under attack
-    #negative = black under attack
-    w_king_square = board.king(chess.WHITE)
-    b_king_square = board.king(chess.BLACK)
-
-    w_attackers = board.attackers(chess.BLACK, w_king_square)
-    b_attackers = board.attackers(chess.WHITE, b_king_square)
-
+    w_king_sq = board.king(chess.WHITE)
+    b_king_sq = board.king(chess.BLACK)
+    w_attackers = board.attackers(chess.BLACK, w_king_sq) if w_king_sq is not None else set()
+    b_attackers = board.attackers(chess.WHITE, b_king_sq) if b_king_sq is not None else set()
     return len(w_attackers) - len(b_attackers)
 
-def king_position(board):
-    #TODO: Finish
-    pass
-
-
 def piece_position_value(board):
-
     positional_score = 0
-
     for square in chess.SQUARES:
         piece = board.piece_at(square)
         if piece:
             piece_type = piece.piece_type
-            
             file = chess.square_file(square)
             rank = chess.square_rank(square)
-
             if piece.color == chess.WHITE:
                 if piece_type == chess.PAWN:
                     positional_score += PAWN_POSITION_TABLE[rank][file]
@@ -167,7 +129,7 @@ def piece_position_value(board):
                     positional_score += KING_POSITION_TABLE[rank][file]
             else:
                 if piece_type == chess.PAWN:
-                    positional_score -= PAWN_POSITION_TABLE[7 - rank][file]  # Reverse rank for black
+                    positional_score -= PAWN_POSITION_TABLE[7 - rank][file]
                 elif piece_type == chess.KNIGHT:
                     positional_score -= KNIGHT_POSITION_TABLE[7 - rank][file]
                 elif piece_type == chess.BISHOP:
@@ -178,85 +140,186 @@ def piece_position_value(board):
                     positional_score -= KING_POSITION_TABLE[7 - rank][file]
     return positional_score
 
-
-def isolated_pawns(board, color):
-    isolated = 0
-    pawn_sqaures = board.pieces(chess.PAWN, color)
-    pawn_files = [chess.square_file(square) for square in pawn_sqaures]
-
-    for sq in pawn_sqaures:
-        file = chess.square_file(sq)
-        adjacent_files = []
-
-        if file - 1 >= 0:
-            adjacent_files.append(file - 1)
-        if file + 1 <= 7:
-            adjacent_files.append(file + 1)
-        
-        if not any(file in pawn_files for file in adjacent_files):
-            isolated += 1
+def pawn_structure(board, color):
+    pawn_squares = board.pieces(chess.PAWN, color)
+    file_counts = [0] * 8
+    for sq in pawn_squares:
+        file_counts[chess.square_file(sq)] += 1
+    doubled = sum(count - 1 for count in file_counts if count > 1)
     
-    return isolated
-
-def doubled_pawns(board, color):
-    doubled = 0
-    file_counts = {i: 0 for i in range(8)}
-
-    for square in board.pieces(chess.PAWN, color):
-        file_counts[chess.square_file(square)] += 1
-
-    for count in file_counts.values():
-        if count > 1:
-            doubled += count - 1
-
-    return doubled
+    # Count isolated pawns: if a file has pawns and neither adjacent file has any.
+    isolated = 0
+    for file in range(8):
+        if file_counts[file] > 0:
+            left = file_counts[file - 1] if file - 1 >= 0 else 0
+            right = file_counts[file + 1] if file + 1 < 8 else 0
+            if left == 0 and right == 0:
+                isolated += file_counts[file]
+    return isolated, doubled
 
 def castling_rights(board):
-    white_kingside = board.has_kingside_castling_rights(chess.WHITE)
-    white_queenside = board.has_queenside_castling_rights(chess.WHITE)
-    black_kingside = board.has_kingside_castling_rights(chess.BLACK)
-    black_queenside = board.has_queenside_castling_rights(chess.BLACK)
-
     return {
-        'white_kingside_castle': white_kingside,
-        'white_queenside_castle': white_queenside,
-        'black_kingside_castle': black_kingside,
-        'black_queenside_castle': black_queenside
+        'white_kingside_castle': board.has_kingside_castling_rights(chess.WHITE),
+        'white_queenside_castle': board.has_queenside_castling_rights(chess.WHITE),
+        'black_kingside_castle': board.has_kingside_castling_rights(chess.BLACK),
+        'black_queenside_castle': board.has_queenside_castling_rights(chess.BLACK)
     }
 
+def king_safety(board, color):
+    king_sq = board.king(color)
+    if king_sq is None:
+        return 0  # Undefined if the king is missing
+    king_file = chess.square_file(king_sq)
+    king_rank = chess.square_rank(king_sq)
+    adjacent_squares = [
+        chess.square(f, r)
+        for f in range(max(0, king_file - 1), min(8, king_file + 2))
+        for r in range(max(0, king_rank - 1), min(8, king_rank + 2))
+        if chess.square(f, r) != king_sq
+    ]
+    pawn_shield = sum(1 for sq in adjacent_squares 
+                      if board.piece_at(sq) and 
+                         board.piece_at(sq).piece_type == chess.PAWN and 
+                         board.piece_at(sq).color == color)
+    enemy = not color
+    enemy_threats = sum(1 for sq in adjacent_squares if board.is_attacked_by(enemy, sq))
+    return pawn_shield - enemy_threats
+
+def add_king_safety_features(board, features):
+    features['white_king_safety'] = king_safety(board, chess.WHITE)
+    features['black_king_safety'] = king_safety(board, chess.BLACK)
+    return features
+
+def is_passed_pawn(board, pawn_sq, color):
+    file = chess.square_file(pawn_sq)
+    rank = chess.square_rank(pawn_sq)
+    enemy_color = not color
+    files_to_check = {file}
+    if file - 1 >= 0:
+        files_to_check.add(file - 1)
+    if file + 1 < 8:
+        files_to_check.add(file + 1)
+    for enemy_sq in board.pieces(chess.PAWN, enemy_color):
+        enemy_file = chess.square_file(enemy_sq)
+        enemy_rank = chess.square_rank(enemy_sq)
+        if enemy_file in files_to_check:
+            if (color == chess.WHITE and enemy_rank > rank) or (color == chess.BLACK and enemy_rank < rank):
+                return False
+    return True
+
+def count_passed_pawns(board, color):
+    return sum(1 for pawn_sq in board.pieces(chess.PAWN, color) if is_passed_pawn(board, pawn_sq, color))
+
+def add_passed_pawn_features(board, features):
+    features['white_passed_pawns'] = count_passed_pawns(board, chess.WHITE)
+    features['black_passed_pawns'] = count_passed_pawns(board, chess.BLACK)
+    return features
+
+def game_phase(board):
+    total_material = 0
+    for piece in PIECE_VALUES:
+        if piece != chess.KING:
+            total_material += PIECE_VALUES[piece] * (
+                len(board.pieces(piece, chess.WHITE)) + len(board.pieces(piece, chess.BLACK))
+            )
+    if total_material > 2400:
+        return 0  # Opening
+    elif total_material > 1400:
+        return 1  # Middlegame
+    else:
+        return 2  # Endgame
+
+def add_game_phase_feature(board, features):
+    features['game_phase'] = game_phase(board)
+    return features
 
 
+# Simple cache for board features keyed by FEN string.
+_features_cache = {}
 
-def board_features(board):
+# def board_features(board, model=4):
+
+#     material_balance = calculate_material_balance(board)
+#     position_value = piece_position_value(board)
+#     mobility = piece_mobility(board)
+#     center_small = control_of_center_small(board)
+#     center_large = control_of_center_large(board)
+#     king_attack = king_attack_balance(board)
+#     castling = castling_rights(board)
+    
+#     white_isolated, white_doubled = pawn_structure(board, chess.WHITE)
+#     black_isolated, black_doubled = pawn_structure(board, chess.BLACK)
+
+#     features = {
+#         'material_balance': material_balance,
+#         'position_value': position_value,
+#         'piece_mobility': mobility,
+#         'control_of_center_small': center_small,
+#         'control_of_center_large': center_large,
+#         'king_attack_balance': king_attack,
+#         'white_isolated_pawns': white_isolated,
+#         'black_isolated_pawns': black_isolated,
+#         'white_doubled_pawns': white_doubled,
+#         'black_doubled_pawns': black_doubled,
+#     }
+#     features.update(castling)
+#     features = add_king_safety_features(board, features)
+#     features = add_passed_pawn_features(board, features)
+#     features = add_game_phase_feature(board, features)
+
+#     return features
+
+def board_features(board, model=4):
+    if model == 0:
+        return board_features_0(board)
+    elif model == 1:
+        return board_features_1(board)
+    elif model == 2:
+        return board_features_2(board)
+    elif model == 3:
+        return board_features_3(board)
+    else:
+        raise ValueError(f"Invalid model number: {model}")
+
+def board_features_0(board):
     material_balance = calculate_material_balance(board)
     position_value = piece_position_value(board)
     mobility = piece_mobility(board)
-    center_small = control_of_center_small(board)
-    center_large = control_of_center_large(board)
     king_attack = king_attack_balance(board)
-    move_number = board.fullmove_number
-    w_isolated = isolated_pawns(board, chess.WHITE)
-    b_isolated = isolated_pawns(board, chess.BLACK)
-    w_doubled = doubled_pawns(board, chess.WHITE)
-    b_doubled = doubled_pawns(board, chess.BLACK)
-    castling = castling_rights(board)
 
     features = {
         'material_balance': material_balance,
         'position_value': position_value,
         'piece_mobility': mobility,
-        'control_of_center_small': center_small,
-        'control_of_center_large': center_large,
-        'king_attack_balance': king_attack,
-        'white_isolated_pawns': w_isolated,
-        'black_isolated_pawns': b_isolated,
-        'white_doubled_pawns': w_doubled,
-        'black_doubled_pawns': b_doubled,
-        #'move_number': move_number
+        'king_attack_balance': king_attack
     }
-
-    features.update(castling)
 
     return features
 
+def board_features_1(board):
+    features = board_features_0(board)
+    center_small = control_of_center_small(board)
+    center_large = control_of_center_large(board)
+    features['control_of_center_small'] = center_small
+    features['control_of_center_large'] = center_large
+    return features
 
+def board_features_2(board):
+    features = board_features_1(board)
+    white_isolated, white_doubled = pawn_structure(board, chess.WHITE)
+    black_isolated, black_doubled = pawn_structure(board, chess.BLACK)
+    features['white_isolated_pawns'] = white_isolated
+    features['black_isolated_pawns'] = black_isolated
+    features['white_doubled_pawns'] = white_doubled
+    features['black_doubled_pawns'] = black_doubled
+    return features
+
+
+def board_features_3(board):
+    features = board_features_2(board)
+    castling = castling_rights(board)
+    features.update(castling)
+    features = add_king_safety_features(board, features)
+    features = add_game_phase_feature(board, features)
+    return features
+    
