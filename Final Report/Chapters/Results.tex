@@ -1,0 +1,407 @@
+\pgfplotsset{compat=1.17} % adjust as needed
+
+
+\chapter{Results/Evaluation}
+
+
+\section{Naive Bayes Evaluation}
+
+The first experiment was to evaluate the Naive Bayes classifier on its own. The classifier was trained on around 10,000 games from the Lichess database. Then features were extracted as mentioned in the methodology section, eventually resulting in the following number of instances:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Class} & \textbf{Count}  \\ \hline
+    Black wins             & 56826           \\ \hline
+    White wins              & 57940           \\ \hline
+    \end{tabular}
+    \caption{Naive Bayes Training Data}
+    \label{tab:naive_bayes_training_data}
+\end{table}
+
+
+
+
+This data was a good split of the two classes, removing the issue of class imbalance. Then this data was split into training and testing data.
+ The classifier used the features as mention in the methodology section. After training, the classfier was tested on unseen data. The results are shown in the following table.
+
+???  Material balance, postion value, mobility, king attack, control pf cnetre small and large   ???
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    \textbf{Metric} & \textbf{Value}  \\ \hline
+    Accuracy        & 0.6080           \\ \hline
+    Precision       & 0.6254           \\ \hline
+    Recall          & 0.5481           \\ \hline
+    F1 Score        & 0.6066           \\ \hline
+    Kappa Score     & 0.2165           \\ \hline
+    \end{tabular}
+    \caption{Naive Bayes Evaluation}
+    \label{tab:naive_bayes_evaluation}
+\end{table}
+
+% Class -1: 56826
+% Class 1: 57940
+% Confusion Matrix: 
+% [[9542 4733]
+%  [6514 7903]]
+% F1 Score:  0.6066147073815372
+% Kappa Score:  0.21648061576292033
+% Accuracy:  0.6080092011710582
+% Recall:  0.5481722965942984
+% Precision:  0.6254352643241532
+% Model saved.
+
+The results show that the classifier doesn't perform very well. The accuracy is 0.0608 whcih is slightly better than randomly guessing which would have an accuracy of 0.5. This shows that the classifier is learning to some extent but not very well. The precision is 0.6254 and recall is 0.5481 whcihc suggests that the classifier is better at predicting the positive outcomes (white winning) than the negative outcomes (black winning). The F1 score shows that the calssifer is slightly effective but there is significant need to improve it, this is similarly shown by the low Kappa score.
+
+Using this classifier in the chess engine, it will not be very effective. However, the classifier was used in the minimax algorithm to see how it would perform. For this experiment, the classifier will completely replace the evaluation function. It is tested by playing against a random engine. 
+
+The results are shown in the following table:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Games Played        & 10           \\ \hline
+    Games Won           & 0           \\ \hline
+    Games Lost          & 0          \\ \hline
+    Games Drawn         & 10           \\ \hline
+    \end{tabular}
+    \caption{Naive Bayes Minimax Evaluation}
+    \label{tab:naive_bayes_minimax_evaluation}
+\end{table}
+
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.6270683887212173
+% {'white': 12, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.4504173964810518
+% {'white': 12, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 2.5669456181987638
+% {'white': 15, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.29698764215601553
+% {'white': 14, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 9.90118701374808
+% {'white': 11, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.4068801231633604
+% {'white': 13, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 34.30969068436396
+% {'white': 14, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.5967418224580826
+% {'white': 12, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.6973249771498227
+% {'white': 7, 'black': 1}
+% Minimax vs Random
+% 1/2-1/2
+% Average time taken for each move: 0.7988217406802707
+% {'white': 13, 'black': 1}
+
+
+% Same thing against stockfish:
+
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.39859261363744736
+% {'white': 10, 'black': 12}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.3527978091012864
+% {'white': 12, 'black': 12}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.48027973071388574
+% {'white': 12, 'black': 11}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.5380149443944295
+% {'white': 14, 'black': 16}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.5493315855662028
+% {'white': 14, 'black': 15}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.4354696715319598
+% {'white': 12, 'black': 13}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.3905089473724365
+% {'white': 9, 'black': 7}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.4604063034057617
+% {'white': 14, 'black': 13}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.4611468519483294
+% {'white': 11, 'black': 12}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.4826975844123147
+% {'white': 10, 'black': 11}
+% {'1-0': 0, '0-1': 10, '1/2-1/2': 0}
+
+The results show that when the classifier is used on its own, it is unable to win any games against a random engine. This is what was predicted as it would be hard for the classifier to learn the nuances of chess. However what is interesting from the games is that even though every game was drawn, on average it had 12 more pieces than random. This indicates that the classifier understands that having more pieces is advantageous so tries to protect its pieces and also capture opponent pieces. The issue is, however, that it doesn't understand how to cause checkmates or how to protect its king, which is vital to winning a game.
+
+The engine that used Naive Bayes above was then also tested against Stockfish at level 0. The results are shown in the following table:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Games Played        & 10           \\ \hline
+    Games Won           & 0           \\ \hline
+    Games Lost          & 10          \\ \hline
+    Games Drawn         & 0           \\ \hline
+    \end{tabular}
+    \caption{Naive Bayes Minimax Evaluation Against Stockfish}
+    \label{tab:naive_bayes_minimax_evaluation_stockfish}
+
+\end{table}
+
+This was expected as if the engine couldn't win against a random engine, that has no strategy to its game play, it woudld be near to impossible to win against Stockfish. ??MAYBE compare time it takes for stockfish to beat random and the above classifier??
+
+The engine that used the naive bayes classifier above used a depth of 3 for the minimax algorithm. This is generally quite low for a chess engine. The same tests were run with the same Naive Bayes model but with a depth of 4 for the minimax algorithm. 
+
+The results are shown in the following table:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Games Played        & 10           \\ \hline
+    Games Won           & 0           \\ \hline
+    Games Lost          & 10          \\ \hline
+    Games Drawn         & 0           \\ \hline
+    \end{tabular}
+    \caption{Naive Bayes Minimax Evaluation Depth 4}
+    \label{tab:naive_bayes_minimax_evaluation_depth_4}
+\end{table}
+
+It seems from these results that increasing the depth of the minimax algorithm didn't improve the performance of the engine. This further suggests that the issue is with the evaluation function that solely relies upon the classfier. Another observation from this is that the time taken for each move is about double compared to when the depth was 3, which is expected as the search tree is much larger. 
+
+A minimax algorithm with alpha beta pruning using traditional evaluation function was also implemented, to be used as a benchamark as well. The evaluation only considered the material balance and the positinal value of pieces. The same tests wiere conducted with a depth of 3. The results against the random engine are shown below:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Games Played        & 10           \\ \hline
+    Games Won           & 10           \\ \hline
+    Games Lost          & 0          \\ \hline
+    Games Drawn         & 0          \\ \hline
+    \end{tabular}
+    \caption{Traditional Minimax Evaluation Depth 4}
+    \label{tab:traditional_minimax_evaluation_depth_4}
+\end{table}
+
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.0666329374118727        
+% {'white': 16, 'black': 2}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.06544745432866084       
+% {'white': 13, 'black': 1}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.05950805346171061       
+% {'white': 16, 'black': 13}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.06503064204484989       
+% {'white': 14, 'black': 9}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.05323359274095105       
+% {'white': 14, 'black': 8}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.06438876020497289       
+% {'white': 15, 'black': 10}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.073584846548132
+% {'white': 16, 'black': 10}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.05293229103088379       
+% {'white': 16, 'black': 11}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.0306335234306228        
+% {'white': 13, 'black': 3}
+% Minimax vs Random
+% 1-0
+% Average time taken for each move: 0.04358914920261928       
+% {'white': 14, 'black': 7}
+% {'1-0': 10, '0-1': 0, '1/2-1/2': 0}
+
+What is interesting from these results is that the traditional algorithm was able to win all games, whereas the Naive Bayes algorithm was unable to win any games. Shown below is the algorithm against Stockfish at level 0.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+    \hline
+    Games Played        & 10           \\ \hline
+    Games Won           & 1           \\ \hline
+    Games Lost          & 9          \\ \hline
+    Games Drawn         & 0           \\ \hline
+    \end{tabular}
+    \caption{Traditional Minimax Evaluation Against Stockfish}
+    \label{tab:traditional_minimax_evaluation_stockfish}
+\end{table}
+
+Here the algorithm is at least able to win 10\% of the time against Stockfish. However, when the depth of the algorithm is increased from 3 to 4, the algorithm is able to win 50\% of the time. This shows the importance of the depth used and, the significant impact it can have on the performance of an engine. However what is also important to note is the time taken to make a move increased 10 fold. 
+
+% Hello from the pygame community. https://www.pygame.org/contribute.html
+% Minimax vs Stockfish
+% 1-0
+% Average time taken for each move: 0.34663150665607856       
+% {'white': 12, 'black': 6}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.27326902250448865       
+% {'white': 6, 'black': 5}
+% Minimax vs Stockfish
+% 1-0
+% Average time taken for each move: 0.7042390436365984        
+% {'white': 10, 'black': 5}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.23526499227241235       
+% {'white': 5, 'black': 3}
+% Minimax vs Stockfish
+% 1-0
+% Average time taken for each move: 0.1439740037264889        
+% {'white': 11, 'black': 1}
+% Minimax vs Stockfish
+% 1-0
+% Average time taken for each move: 0.18150691266329783       
+% {'white': 12, 'black': 4}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.342784122987227
+% {'white': 5, 'black': 5}
+% Minimax vs Stockfish
+% 1-0
+% Average time taken for each move: 0.6357292710689076        
+% {'white': 12, 'black': 4}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.4371111918303926        
+% {'white': 6, 'black': 8}
+% Minimax vs Stockfish
+% 0-1
+% Average time taken for each move: 0.3347185233543659        
+% {'white': 10, 'black': 10}
+% {'1-0': 5, '0-1': 5, '1/2-1/2': 0}
+
+
+
+\section{Naive Bayes with Traditional Evaluation Function}
+
+Based on the results above, it is clear that the traditional evaluation function does much better than the one that uses the Naive Bayes classifier. However, it was shown that the Naive Bayes does understand some aspects that are important like material balance. Therefore, the next experiment wants to explore the idea of whether the Naive Bayes classfier can help support the traditional evaluation function. 
+
+???TODO:FINISH??
+
+\section{Influence of Feature Selection}
+
+The features used to train a model are crucial to the perfomance of the model. This is the only picture of the world that the model has. The better the features, the more realistic picture it has of the world. The features used previously when trained with 10,000 games seemed to only yield an F1 score of 0.6, which is not much better than random guessing. The next experiment investigates the impact of feature selection on the performace of the model.
+Therefore the same model was trained with the same number of games but with different features. 
+All the models were trained with 100,000 games and the features used for each model are shown below:
+
+\begin{itemize}
+    \item Model 0: Was restricted on only using material balance, positional value, mobility, king attack, as features
+    \item Model 1: Same as Model 0 but also considred the control of the centre. This was 2 seperate features, one for number of pieces in the 
+    2 by 2 square in the centre and the other for the 4 by 4 square in the centre.
+    \item Model 2: Same as Model 1 but also considered the structure of pawns. This was determined by the number of isolated pawns and doubles pawns. This equated to 4 more features, 2 for each colour.
+    \item Model 3: Same as Model 2 but included more complex features. One being the castling rights of each player as well as a way to determine the game phase, either beginning, middle or end game. Another feature this model considered was king safety and this was determined by the number of pawns around the king as well as number of attacks on sqaures adjacent to the king.
+\end{itemize}
+
+\begin{table}[h]
+    \centering
+    \caption{Model Performance Metrics}
+    \begin{tabular}{lccccc}
+        \toprule
+        Model  & F1 Score & Kappa Score & Accuracy & Recall & Precision \\
+        \midrule
+        Model 0 & 0.60398  & 0.22042  & 0.60914  & 0.49486  & 0.64928  \\
+        Model 1 & 0.60943  & 0.22190  & 0.61047  & 0.55795  & 0.62995  \\
+        Model 2 & 0.61158  & 0.22456  & 0.61198  & 0.57858  & 0.62618  \\
+        Model 3 & 0.61263  & 0.22513  & 0.61264  & 0.61920  & 0.61678  \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+% $ python training.py
+% Class -1: 1113075
+% Class 1: 1137649
+% Confusion Matrix: 
+% [[201851  76108]
+%  [143824 140899]]
+% F1 Score:  0.6039803401379297
+% Kappa Score:  0.22041543437430355
+% Accuracy:  0.6091362439175235
+% Recall:  0.49486342866575583
+% Precision:  0.6492832028459912
+% Model0 saved.
+% Class -1: 1113075
+% Class 1: 1137649
+% Confusion Matrix: 
+% [[184639  93320]
+%  [125863 158860]]
+% F1 Score:  0.6094330510221935
+% Kappa Score:  0.2219042268569834
+% Accuracy:  0.6104673687802347
+% Recall:  0.5579457929285656
+% Precision:  0.6299468633515742
+% Model1 saved.
+% Class -1: 1113075
+% Class 1: 1137649
+% Confusion Matrix: 
+% [[179613  98346]
+%  [119987 164736]]
+% F1 Score:  0.6115831460689735
+% Kappa Score:  0.2245609499676403
+% Accuracy:  0.6119779911210951
+% Recall:  0.5785833950892622
+% Precision:  0.6261773895591488
+% Model2 saved.
+% Class -1: 1113075
+% Class 1: 1137649
+% Confusion Matrix: 
+% [[168420 109539]
+%  [108422 176301]]
+% F1 Score:  0.6126283382210077
+% Kappa Score:  0.22512926687487078
+% Accuracy:  0.6126391105455657
+% Recall:  0.6192018207169776
+% Precision:  0.6167821158690177
+% Model3 saved. 
+
+These results subtly show that the more features considered, the better the model generally performs, proven by the increase in F1 score from 0.603 for Model 0 to 0.613 for model 3. This supports the idea that the more information given to the model, the more it can understand about world. However the increase in model accuracy is very small that if an F1 score of 0.7 is aimed for, more than 150 features would be required. This is not feasible as during real time play, the engine would take too long to extract these features in order to make a move. The problems of misclassifying could be down to two factors, the first being the features used are not complex enough and not extracting enough nuances in the game that the model requires. However increase complexity of features would result in an engine that is much slower and not feasible to be used for real time game play. The second factor could be that the model is not complex enough to understand the intricacies of chess and therefore its unable to learn the patterns that grandmasters make to win games.
+
+
+
+
+
