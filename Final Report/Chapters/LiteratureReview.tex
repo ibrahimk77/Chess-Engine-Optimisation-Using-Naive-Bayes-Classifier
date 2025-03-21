@@ -1,1 +1,39 @@
 \chapter{Literature Review}
+
+
+\section{Naive Bayes in other domains}
+There has been extensive research on Naive Bayes and where it can be applied. While many researchers have explored the use of Naive Bayes in different contexts, the success of Naive Bayes has varied between different domains.
+
+The most popular use of Naive Bayes is in spam detection. In the paper 'An Evaluation of Naive Bayesian Anti-Spam Filtering' \cite{androutsopoulosEvaluationNaiveBayesian2000} Androutsopoulos et al. evaluate the performance of Naive Bayes in spam filtering. They demonstrate that Naive Bayes performs surprisingly well in text classification tasks like spam filtering. Sahami et al. (1998) \cite{sahamiBayesianApproachFiltering} showed that Naive Bayes was very successful in classifying spam detection. They conducted a number of experiments, the first of which considered attributes as only word-attributes. The second experiment also considered 35 hand-crafted phrases such as "only \$" and "FREE!". The third experiment considered non-textual features such as attachments and email domains (e.g. spam is rarely sent from .edu domains). 
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{lcc}
+    \toprule
+    \textbf{Features} & \textbf{Spam Precision} & \textbf{Spam Recall} \\
+    \midrule
+    Words only & 97.1\% & 94.3\% \\
+    Words + Phrases & 97.6\% & 94.3\% \\
+    Words + Phrases + Non-Textual & 100.0\% & 98.3\% \\
+    \bottomrule
+    \end{tabular}
+    \caption{Spam detection performance of Naive Bayes with different features}
+\end{table}
+
+These results indicate the power Naive Bayes has despite its simplicity and assumption of feature independence. This justifies the use of Naive Bayes in contexts where the features are not necessarily independent, like this project where chess features are certainly very linked. What was interesting from these results as well was the fact that the model did significantly better when more features were used, such that the model was able to achieve 100\% precision and 98.3\% recall. Androutsopoulos et al. built upon this work to investigate the effect of attribute selection, training size and lemmatisation on the performance of the Naive Bayes model. Similarly to Sahami et al., they found that the model performed better when more features were used. This can translate well to chess since the selection of meaningful features may affect the quality of predictions. The paper also investigates the idea of how harmful it is to misclassify a legitimate email as spam compared to classifying a spam email as legitimate. Sahami et al. assumed that the cost of misclassifying a legitimate email as spam is as harmful as letting 999 spam emails through. in \cite{androutsopoulosEvaluationNaiveBayesian2000}, the authors considered different contexts where this threshold could be different. This is also relevant to chess, where misclassifying a winning move could be more harmful than misclassifying a losing move however in certain contexts, the cost of both may be similar. The paper concludes that while Naive Bayes performs well in practise, it requires "safety nets" to be reliable in practise. In the context of emails, instead of deleting the email, the system could re-send it to a private email address. In the context of chess, the probabilistic classifier could help prioritise move evaluations and minimax is used to ensure strategic accuracy of decisions. 
+
+Naive Bayes has shown to be very effective in text-based domains including spam detection as discussed before as well as in anti-cyber bullying systems \cite{igeAIPoweredAntiCyber2022}. However it has also been shown to be not as effective in other contexts. Hassan, Khan and Shah (2018) investigated a variety of classification algorithms in classifying Heart Disease and Hepatisis. The algorithms they evaluated were Logistic Regression, Decision Trees, Naive Bayes, K-Nearest Neighbours, Support Vector Machines and Random Forests. Their findings consistently showed that Naive Bayes was the worst performing algorithm in both cases. For Heart Disease, Naive Bayes achieved an accuracy of 50\% whereas Random Forests achieved an accuracy of 83\%. For Hepatisis, Naive Bayes achieved an accuracy of 68\% compared to Random Forests which achieved an accuracy of 85\%. This result contrasts what was found in the previous research on spam detection. These findings reinforce the idea that Naive Bayes is not a one-size-fits-all algorithm and it can excel in certain domains but its effectiveness is not guaranteed in all applications. 
+
+\section{Machine Learning in Chess}
+
+The first machine that is mentioned in the history books that played chess against humans was the Turk \cite{stephensMechanicalTurkShort2023}. This 1770s mechanical automaton was able to not only play chess but was able to beat human opponents. It was then later revealed that this machine was actually operated by a human making the moves. 
+
+The biggest milestone to date in the world of chess is undoubtedly Deep Blue vs Kasparov in 1997. Deep Blue was a chess engine created by IBM and in 1997, it was able to beat the reigning world champion Garry Kasparov. The first match between Kasparov and Deep Blue was in 1996 where Kasparov won. After this defeat, IBM hired grandmaster Joel Benjamin to improve the evaluation function of the engine. The rematch in 1997 then surprised the world where Deep Blue was able to beat Kasparov 3.5-2.5. This story emphasises the importance of the evaluation function in chess engines and that the just pure processing power is not enough. 
+
+Stockfish is a free, open-source chess engine that is widely regarded as one of the strongest chess engines in the world. It uses alpha-beta pruning and a variety of other techniques to evaluate positions. 
+
+In 2017, Google's DeepMind released AlphaZero, a chess engine that was able to beat Stockfish. What is notable in this chess engine is it's reliance on machine learning techniques. AlphaZero uses a Monte Carlo Tree Search algorithm combined with a deep neural network. Unlike Stockfish, it learns from self play, where it plays games against itselves and learns from its mistakes \cite{kleinNeuralNetworksChess2022}. This was the most prominent engine that used machine learning techniques to play chess. One benefit of this technique is that it examines fewer positions than Stockfish but spends more time on evaluating each one. This mimics human-like pattern recognition by prioritising positional understanding over brute force. The core of AlphaZero is a deep neural network that takes as input the board state and outputs the probability of winning and it is trained using reinforcement learning. AlphaZero's design is general and can be adaptable to other two-player, determinstic games. It has been successfully applied to Shogi and also Go with AlphaGo, which relies upon five neural networks \cite{kleinNeuralNetworksChess2022}.
+
+AlphaZero represented a paradigm shift in the world of chess engines. It showed that machine learning techniques can outperform traditional methods like alpha-beta pruning. Even stockfish, which is known for its brute force approach, has integrated efficient neural networks (NNUE) with its traditional search methods. An important note is that these well-known chess engines rely mainly upon neural networks. This project aims to investigate if other techinques can yield the same result, specifically Naive Bayes.
+
+

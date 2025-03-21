@@ -531,3 +531,4 @@ TSWLatexianTemp*
 *.csv
 *.joblib
 *.joblib
+/experiments/stockfish
