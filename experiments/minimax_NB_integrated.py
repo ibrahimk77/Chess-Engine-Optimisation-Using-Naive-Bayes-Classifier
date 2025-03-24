@@ -1,51 +1,53 @@
 import chess
+from naive_bayes import NaiveBayes
+from features import board_features
+import pandas as pd
+import time
+import numpy as np
 
 
-def alphaBeta(board, alpha, beta, depth, is_maximising):
 
+def alphaBeta_integrated(board, alpha, beta, depth, is_maximising, model, scaler, feature, nb_weight):
+    nodes_explored = 1  
     if depth == 0 or board.is_game_over():
-        return (evaluate(board), None)
+        return evaluate(board, model, scaler, feature, nb_weight), None, nodes_explored
 
     legal_moves = list(board.legal_moves)
-    best_move = legal_moves[0]
+    legal = sorted(legal_moves, key=lambda move: evaluate_move(move, board), reverse=True)
 
-    legal_moves = sorted(legal_moves, key=lambda move: evaluate_move(move, board), reverse=True)
 
+    best_move = legal[0]
     if is_maximising:
-        val = -float("inf")
-        for move in legal_moves:
+        value = -float("inf")
+        for move in legal:
             board.push(move)
-            current_val = alphaBeta(board, alpha, beta, depth - 1, False)[0]
+            eval_val, _, nodes_child = alphaBeta_integrated(board, alpha, beta, depth - 1, False, model, scaler, feature, nb_weight)
+            nodes_explored += nodes_child 
             board.pop()
-
-            if current_val > val:
-                val = current_val
+            if eval_val > value:
+                value = eval_val
                 best_move = move
-            
-            alpha = max(alpha, current_val)
+            alpha = max(alpha, value)
             if beta <= alpha:
                 break
-
-        return (val, best_move)
-
+        return value, best_move, nodes_explored
     else:
-        val = float("inf")
-        for move in legal_moves:
+        value = float("inf")
+        for move in legal:
             board.push(move)
-            current_val = alphaBeta(board, alpha, beta, depth - 1, True)[0]
+            eval_val, _, nodes_child = alphaBeta_integrated(board, alpha, beta, depth - 1, True, model, scaler, feature, nb_weight)
+            nodes_explored += nodes_child 
             board.pop()
-
-            if current_val < val:
-                val = current_val
+            if eval_val < value:
+                value = eval_val
                 best_move = move
-            
-            beta = min(beta, current_val)
+            beta = min(beta, value)
             if beta <= alpha:
                 break
+        return value, best_move, nodes_explored
 
-        return (val, best_move)
 
-def evaluate(board):
+def traditional_evaluate(board):
     
     piece_values = {
         chess.PAWN: 100,
@@ -103,16 +105,6 @@ def evaluate(board):
         [0, 0, 0, 0, 0, 0, 0, 0]
     ]
 
-    ROOK_POSITION_TABLE = [
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [5, 10, 10, 10, 10, 10, 10, 5],
-        [5, 10, 15, 15, 15, 15, 10, 5],
-        [5, 10, 15, 20, 20, 15, 10, 5],
-        [5, 10, 15, 20, 20, 15, 10, 5],
-        [5, 10, 15, 15, 15, 15, 10, 5],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0]
-    ]
 
     KING_POSITION_TABLE = [
         [-30, -40, -40, -50, -50, -40, -40, -30],
@@ -174,10 +166,20 @@ def evaluate(board):
                     evaluation -= ROOK_POSITION_TABLE[7 - rank][file]
                 elif piece_type == chess.KING:
                     evaluation -= KING_POSITION_TABLE[7 - rank][file]
-
-
+    
     return evaluation
 
+
+def predict_new_data_prob(board, model, scaler, i):
+
+    features = board_features(board, i)
+    data = pd.DataFrame([features])
+    X = scaler.transform(data)
+
+    return model.predict_prob(X)[0]
+
+    
+    
 
 def evaluate_move(move, board):
 
@@ -195,3 +197,35 @@ def evaluate_move(move, board):
         return piece_values[target_piece.piece_type]
     else:
         return 0
+
+
+def softmax(log_probs):
+    # log_probs is a dictionary or list of log probability values
+    exps = np.exp(log_probs)  # exponentiate each log probability
+    return exps / np.sum(exps)
+    #TODO: mention in report to convert log probs to probs using softmax
+
+
+def evaluate(board, model, scaler, feature, nb_weight):
+    traditional_weight = 1 - nb_weight
+
+    nb_pred = predict_new_data_prob(board, model, scaler, feature)
+    nb_probs = softmax(np.array(list(nb_pred.values())))
+    nb_score = nb_probs[1]
+
+    traditional_eval = traditional_evaluate(board)
+
+    trad_min, trad_max = -3800, 3800
+
+    trad_norm = (traditional_eval - trad_min) / (trad_max - trad_min)
+
+    integrated_eval = nb_weight * nb_score  + traditional_weight * trad_norm
+
+    if board.is_checkmate():
+        if board.turn == chess.WHITE:
+            return -float("inf")
+        else:
+            return float("inf")
+    
+    return integrated_eval
+

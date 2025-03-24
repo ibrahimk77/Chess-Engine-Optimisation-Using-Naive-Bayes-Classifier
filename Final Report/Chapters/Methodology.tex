@@ -4,15 +4,15 @@
 As mentioned previously, the focus of this paper is to explore the uses of Naive Bayes in chess and how this could impact other domains in computer science. This chapter will mention the methodology that was used to implement the Naive Bayes classifier in the chess engine. 
 
 \section{Random Chess Engine}
-??????Initially I wrote code to visualise the chess board. This makes it easier to to understand the game state and see what moves my chess engine would make. This makes it easier to understand my engine as well as debugging issues it may have. ????[SHOULD I INCLUDE THIS]
+% ??????Initially I wrote code to visualise the chess board. This makes it easier to to understand the game state and see what moves my chess engine would make. This makes it easier to understand my engine as well as debugging issues it may have. ????[SHOULD I INCLUDE THIS]
 
-I utilised the python-chess library to as a base to create my chess engine. The reason why I chose to use this library is because it has many features needed. This includes support for FEN notation, methods to get legal moves, and also I chose to use it due to the optimisations it uses including representing the board as a bitboard.
+For the purpose of this project, the python-chess library will be used as a base to create chess engine. The reason for this choice of library is because it has integrated features needed for this project. This includes support for FEN notation, methods to get legal moves, and also it was also chosen due to the optimisations it uses including representing the board as a bitboard.
 
-Then I created a chess engine that randomly picks moves. This implementation was very simple due to python-chess' method \textit{board.legalmoves()} which provides all the legal moves available to the current player. Using this list of moves, one is then chosen at random. The purpose of this random engine is be used as a benchmark for the main chess engine to be created.
+The first step was to create a chess engine engine that randomly picks moves. This implementation was very simple due to python-chess' method \textit{board.legalmoves()} which provides all the legal moves available to the current player. Using this list of moves, one is then chosen at random. The purpose of this random engine is be used as a benchmark for the main chess engine to be created.
 
 \section{MiniMax and Alpha-Beta pruning}
 Minimax is used by the majority of chess engines. The aim is to implement Naive Bayes to improve the minimax algorithm. So intuitively the first step is implement minimax. Alpha-Beta is much more powerful than basic minimax as it will always give the same output as minimax and is much faster. Therefore, Alpha-Beta will be used directly. This is the pseudocode for the algorithm used. A similar method is use for alphaBetaMin.
-????UPDATE pseudocode???
+% ????UPDATE pseudocode???
 \begin{algorithm}[h]
     \caption{Alpha-Beta Pruning Algorithm}
     \begin{algorithmic}
@@ -41,9 +41,9 @@ Minimax is used by the majority of chess engines. The aim is to implement Naive 
     \end{algorithmic}
 \end{algorithm}
 
-When using alpha-beta pruning, a depth of 3 was used. This was due to the limited computational power available. The depth of the search tree is the main thing that determines the performance of the chess engine. The higher the depth, the more possibilities the engine can explore which means each move made would have been given more consideration resulting in a better move.
+When using alpha-beta pruning, a depth of 3 was used. This was due to the limited computational power available. The depth of the search tree is a primary factor that determines the performance of the chess engine. The higher the depth, the more possibilities the engine can explore which means each move made would have been given more consideration resulting in a better move.
 
-The other part of the minimax algorithm that is important is the evaluation function. This is what determines the moves that are made. It gives a value to a game state to approximate which player is winning at that point in time as it is infeasible to search the entire game tree. So the evaluation function is used to estimate the winner at a certain point in the game. The evaluation function used for the purpose of this project will be very simple and will be mainly based on material balance. This is a good indicator of the current state of the game as generally the more pieces a player has the more options they have, therefore they are more likely to win.
+The other factor of the minimax algorithm that is important is the evaluation function. This is what determines the moves that are made. It gives a value to a game state to approximate which player is winning at that point in time as it is infeasible to search the entire game tree. So the evaluation function is used to estimate the winner at a certain point in the game. The evaluation function used for the purpose of this project will be very simple and will be mainly based on material balance. This is a good indicator of the current state of the game as generally the more pieces a player has the more options they have, therefore they are more likely to win.
 
 \begin{equation}
     \label{eq:material_1}
@@ -71,12 +71,15 @@ However, considering each piece of equal value is not representative of the true
     \label{tab:values}
 \end{table}
 
-This evaluation function is relatively strong and incentivises the engine to take pieces when possible and also to protect its own pieces. After testing this evaluation function, as expected, the engine was winning initially by taking pieces. However, it never won against the random engine. After analysing the games played, the problem was in the end game. I realised that the evaluation function did not incentivise the engine to check the opponent, which is the most important part of chess. Therefore, checkmates were considered terminal nodes by giving them a value of $\pm \infty$ dependant on who is winning. A value of 10 was also given to check as this is a very strong move. This was then the ???final??? evaluataion function used.
+This evaluation function is relatively strong and incentivises the engine to take pieces when possible and also to protect its own pieces. After testing this evaluation function, as expected, the engine was winning initially by taking pieces. However, it never won against the random engine. After analysing the games played, the problem was in the end game. The evaluation function did not incentivise the engine to check the opponent, which is the most important part of chess. Therefore, checkmates were considered terminal nodes by giving them a value of $\pm \infty$ dependant on the player that is winning. A value of 10 was also given to check as this is a very strong move. 
+% This was then the ???final??? evaluataion function used.
 
 
 \section{Data Collection}
 
-The choice of dataset used for the Naive Bayes Classifier was an important task to ensure the classifier had enough data to be trained on but also have good data to be trained on. There were many datasets that I came across. In the end, I chose to use a dataset from kaggle.com [REFERENCE] which had 6.25 million chess games played on lichess.com in July 2016 . This gave me a lot of flexibility as there is a lot of data to train on. There were other datasets like a set of 4 million games on chess.com only played with grandmaster players. However, I wanted to train a model to work for all level of platers so I chose tp go with the lichess dataset. 
+The choice of dataset used for the Naive Bayes Classifier was an important task to ensure the classifier had enough data to be trained on but also have good data to be trained on. There were many datasets that were considered, however in the end, the dataset from kaggle.com was used 
+% [REFERENCE] 
+which had 6.25 million chess games played on lichess.com in July 2016 . This provided a lot of flexibility as there is a lot of data to train on. There were other datasets like a set of 4 million games on chess.com only played with grandmaster players. However, the aim is to train a model to work for all level of players so the lichess database was chosen. 
 
 The lichess dataset was in csv format. These are the features that were part of the dataset:
 
@@ -97,8 +100,7 @@ The lichess dataset was in csv format. These are the features that were part of 
 
 A lot of the features would not be very useful to train the model. The ID's of the players would not be useful to train with so was discarded. The UTCDate, UTCTime also would not be useful as the time of day a game is played wouldn't affect the outcome of the game or to decide the best move to make. The Elo ratings of the players would be useful as players of similar levels may play in similar ways however this also wasn't used as this information won't always be available when using the engine. The way the game terminated is also information that wouldn't be beneficial as all that is important is the final game result. The most important features that was utilised was the result of the game and the sequence of moves in algebraic notation.
 
-The data then needed to be preprocessed. The moves in algebraic notation needed to be converted in a format that can be used by the Naive Bayes Classifier. For each game, I used the python-chess library to simulate the game, so for each move the board is updated. However using every move would be too much data to train on, especially since consecutive moves are highly correlated. Therefore, for most of the game I use every 6 moves however during end game, I use every other move. This is because during the end game, each move will most likely have a bigger impact on the result of the game. For the purpose of this project, end game is after 75\% of the moves have been made. We also make sure that the last move is included in the data as well since this is the game state that determined the result of the game.
-
+The data then needed to be preprocessed. The moves in algebraic notation needed to be converted in a format that can be used by the Naive Bayes Classifier. For each game, the python-chess library to simulate the game, so for each move the board is updated. However using every move would be too much data to train on, especially since consecutive moves are highly correlated. Therefore, for most of the game the features at every 6 moves was used however during end game, every other move was used. This is because during the end game, each move will most likely have a bigger impact on the result of the game. For the purpose of this project, end game is after 75\% of the moves have been made. The last move is also included in the data as this is the move that determined the result of the game.
 \section{Feature Selection}
 
 Material balance is the first feature implemented. Arguably this is the most important feature to estimate the current state of a chess game. For the purpose of this project, the values in Table~\ref{tab:values} were used to calculate the material balance, using Equation~\ref{eq:material_2}. The material balance is positive if the values of White's pieces are grater than the values of Black's pieces and vice versa.
@@ -262,7 +264,7 @@ The Naive Bayes Classifier was then train on the preprocessed data. Due to restr
 
 \section{Model Evaluation}
 
-??? Maybe include Kappa score????
+% ??? Maybe include Kappa score????
 
 After training the model, we are interested in knowing how well the model performs and generalises to new data. There are many ways to evalutate a model. One way to do this is to use a confusion matrix. A confusion matrix is a table that shows how well the model classfied instances. The confusion matrix is shown in Table~\ref{tab:confusion_matrix}.
 

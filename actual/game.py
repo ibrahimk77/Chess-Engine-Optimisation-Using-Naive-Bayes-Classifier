@@ -3,17 +3,17 @@ import chess
 import chess.engine
 import time
 import random
-#from minimax import alphaBeta
-from minimax_NB_eval import alphaBeta
+from minimax import alphaBeta
+#from minimax_NB_eval import alphaBeta
 #from minimax_NB_integrated import alphaBeta
 from chess_visual import VisualBoard
 
 
 random.seed(1)
-DEPTH = 3
+DEPTH = 4
 LEVEL = 0
 PLAYER_ONE = 2
-PLAYER_TWO = 0
+PLAYER_TWO = 1
 
 # :param player_one: The first player.
 #     0 -> random, 1-> stockfish, 2 -> minimax
@@ -36,10 +36,6 @@ def play_game_blind(player_one, player_two, skill_level=1, depth=3):
     players = {0: "Random", 1: "Stockfish", 2: "Minimax"}
 
     print(f"{players[player_one]} vs {players[player_two]}")
-
-
-
-
 
     board = chess.Board()
     engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)

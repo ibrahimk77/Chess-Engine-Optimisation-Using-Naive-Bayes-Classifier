@@ -28,6 +28,8 @@ def train(dataset, model_num, data):
     f1 = f1_score(y_test, y_pred, average='weighted')
     kappa = cohen_kappa_score(y_test, y_pred)
     accuracy = accuracy_score(y_test, y_pred)
+    print(np.unique(y_pred))    
+    print(np.unique(y_test))
     recall = recall_score(y_test, y_pred)
     precision = precision_score(y_test, y_pred)
 
@@ -41,12 +43,12 @@ def train(dataset, model_num, data):
         'precision': precision
         }
     
-    return eval
 
     dump(model, f'model_{dataset}_{model_num}.joblib')
     dump(scaler, f'scaler_{dataset}_{model_num}.joblib')
 
-    print("Model saved.")
+    print(f"Model {dataset} {model_num} saved.")
+    return eval
 
 def train_multiple():
     for i in range(4):
@@ -89,4 +91,4 @@ def train_multiple():
 
 
 
-train_multiple()
+#train_multiple()

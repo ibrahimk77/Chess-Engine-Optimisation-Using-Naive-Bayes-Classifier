@@ -26,7 +26,7 @@ The first experiment was to evaluate the Naive Bayes classifier on its own. The 
 This data was a good split of the two classes, removing the issue of class imbalance. Then this data was split into training and testing data.
  The classifier used the features as mention in the methodology section. After training, the classfier was tested on unseen data. The results are shown in the following table.
 
-???  Material balance, postion value, mobility, king attack, control pf cnetre small and large   ???
+% ???  Material balance, postion value, mobility, king attack, control pf cnetre small and large   ???
 
 \begin{table}[H]
     \centering
@@ -178,7 +178,8 @@ The engine that used Naive Bayes above was then also tested against Stockfish at
 
 \end{table}
 
-This was expected as if the engine couldn't win against a random engine, that has no strategy to its game play, it woudld be near to impossible to win against Stockfish. ??MAYBE compare time it takes for stockfish to beat random and the above classifier??
+This was expected as if the engine couldn't win against a random engine, that has no strategy to its game play, it woudld be near to impossible to win against Stockfish. 
+% ??MAYBE compare time it takes for stockfish to beat random and the above classifier??
 
 The engine that used the naive bayes classifier above used a depth of 3 for the minimax algorithm. This is generally quite low for a chess engine. The same tests were run with the same Naive Bayes model but with a depth of 4 for the minimax algorithm. 
 
@@ -322,7 +323,7 @@ Here the algorithm is at least able to win 10\% of the time against Stockfish. H
 
 Based on the results above, it is clear that the traditional evaluation function does much better than the one that uses the Naive Bayes classifier. However, it was shown that the Naive Bayes does understand some aspects that are important like material balance. Therefore, the next experiment wants to explore the idea of whether the Naive Bayes classfier can help support the traditional evaluation function. 
 
-???TODO:FINISH??
+TODO:FINISH
 
 \section{Influence of Feature Selection}
 

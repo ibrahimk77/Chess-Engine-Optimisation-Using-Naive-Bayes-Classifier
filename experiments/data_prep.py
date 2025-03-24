@@ -63,6 +63,8 @@ def preprocess_data(df, output_file, i):
     all_features = []
     
     for index, row in df.iterrows():
+        if row['Result'] == '1/2-1/2':
+            continue
         features = features_from_AN(row['AN'], row['Result'], i)
         all_features.extend(features)
     
@@ -78,7 +80,7 @@ def preprocess_data_4():
         preprocess_data(f'chess_games_100k.csv', f'chess_games_features_{i}.csv', i)
         
 #preprocess_data('chess_games_10k.csv', 'chess_games_features.csv', 1)
-preprocess_data_4()
+#preprocess_data_4()
 
 
 
