@@ -3,7 +3,7 @@
 % mohammad.i.khan@kcl.ac.uk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \documentclass[20pt]{informatics-report}
-% \setlength{\parskip}{1em}
+\setlength{\parskip}{1em}
 \usepackage{color}
 \usepackage{caption}
 \usepackage{pgfplots}
@@ -12,13 +12,15 @@
 \usepackage{amsmath}
 \usepackage{subcaption}
 \usepackage{algorithm}
+\usepackage{url}
 \usepackage{algpseudocode}
 \usepackage[square,sort,comma,numbers]{natbib} %References
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Front Matter - project title, name, supervisor name and date
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{6CCS3PRJ Final Year\\\vspace{0.2cm}Individual Project Report Title}
+% \title{6CCS3PRJ Final Year\\\vspace{0.2cm}Individual Project Report Title}
+\title{Naive Bayes Classifier in a Chess Engine}
 \author{Mohammad Ibrahim Khan}
 \studentID{k22013981}
 \supervisor{Jeffery Raphael}
@@ -28,7 +30,7 @@
 \date{\today}
 
 \abstractFile{FrontMatter/abstract.tex}
-\ackFile{FrontMatter/acknowledgements.tex} %Remove line if you do not want acknowledgements
+% \ackFile{FrontMatter/acknowledgements.tex} %Remove line if you do not want acknowledgements
 
 \begin{document}
 \createFrontMatter
@@ -53,14 +55,14 @@ Machine Learning is at the heart of modern chess engines like AlphaZero and Stoc
 The aim of this project is to create a chess engine that uses machine learning techniques that aren't popular within the chess engine field, to explore the potential of these techniques but also to explore what processes can be shared between different machine learning techniques.
 Chess engines are usually used as a benchmark for advancements in AI, so this project could be a stepping stone for future research. 
 
-Minimax is a popular algorithm which is fundemental in chess engines. This, in conjuction with Alpha-Beta pruning, allows the engine to search through a game tree in order to find the best move. Due to the exponential growth of the game tree, its not feasible to searcht the entire tree. This is where machine learning is used to predict the best move in order to reduce the search space. Many techniques have been used from Neural Networks to Natural Language Process. 
+Minimax is a popular algorithm which is fundamental in chess engines. This, in conjunction with Alpha-Beta pruning, allows the engine to search through a game tree in order to find the best move. Due to the exponential growth of the game tree, its not feasible to search the entire tree. This is where machine learning is used to predict the best move in order to reduce the search space. Many techniques have been used from Neural Networks \cite{kleinNeuralNetworksChess2022} to Natural Language Process \cite{NLPinChess}. 
 % [REFERENCE]. ???GAPS???
 
-This research focusses on how a Naive Bayes Classifier can be implemented in a search algorithm like Minimax to improve positional evaluation in a chess engine. Naive Bayes has been see to be effective in other contexts like spam detection and due to its simplicity and efficiency, it could be ideal for this application. Popular machine learning algorithms used in chess engines are usually very complex and require a lot of computational power however Occams Razor states that simplicity is usually the best option. This research wants to see if this principle holds in this domain. 
+This research focusses on how a Naive Bayes Classifier can be implemented in a search algorithm like Minimax to improve positional evaluation in a chess engine. Naive Bayes has been seen to be effective in other contexts like spam detection and due to its simplicity and efficiency, it could be ideal for this application. Popular machine learning algorithms used in chess engines are usually very complex and require a lot of computational power however Occam's Razor states that simplicity is usually the best option. This research wants to see if this principle holds in this domain. 
 
-The standard minimax algorithm is limited by the evaluation function. Usually they only base themselves on piece values. However, chess has more intricacies that may not be seen at face value, including piece positions relative to each other as well as identifying weaknesses. This is where I hope a Naive Bayes classifier can be utilised to try to learn these intricacies better than a standard evaluation function.
+The standard minimax algorithm is limited by the evaluation function. Usually they only base themselves on piece values. However, chess has more intricacies that may not be seen at face value, including piece positions relative to each other as well as identifying weaknesses. This is where a Naive Bayes classifier could be utilised to try to learn these intricacies better than a standard evaluation function.
 
-The purpose of this project is to explore the idea of using a Naive Bayes Classifier in a chess engine to improve the performance of a minimax based chess engine. Is it viable for a simpler machine learning algorithm like Naive Bayes to be used in a chess engine in order to reduce complexity of the engine but without sacrificing performance? This is the primary research question that this project will explore. It will also explore different ways of implementing the classifier, for example, could it completely replace the traditional evaluation function or used in order to support it.
+The purpose of this project is to explore the potential of using a Naive Bayes Classifier in a chess engine to improve the performance of a minimax based chess engine. Is it viable for a simpler machine learning algorithm like Naive Bayes to be used in a chess engine in order to reduce complexity of the engine but without sacrificing performance? This is the primary research question that this project will explore. It will also explore different ways of implementing the classifier, for example, could it completely replace the traditional evaluation function or used in order to support it.
 
 
 
