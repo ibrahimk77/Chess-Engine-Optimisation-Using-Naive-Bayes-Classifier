@@ -11,13 +11,12 @@ def alphaBeta_ordering(board, alpha, beta, depth, is_maximising, model, scaler, 
         return evaluate(board), None, nodes_explored
 
     legal_moves = list(board.legal_moves)
-    legal = sorted(legal_moves, key=lambda move: evaluate_move(move, board, model, scaler, feature), reverse=True)
 
 
     best_move = legal[0]
     if is_maximising:
         value = -float("inf")
-        for move in legal:
+        for move in legal_moves:
             board.push(move)
             eval_val, _, nodes_child = alphaBeta_ordering(board, alpha, beta, depth - 1, False, model, scaler, feature)
             nodes_explored += nodes_child 
@@ -31,7 +30,7 @@ def alphaBeta_ordering(board, alpha, beta, depth, is_maximising, model, scaler, 
         return value, best_move, nodes_explored
     else:
         value = float("inf")
-        for move in legal:
+        for move in legal_moves:
             board.push(move)
 
             eval_val, _, nodes_child = alphaBeta_ordering(board, alpha, beta, depth - 1, True, model, scaler, feature)
@@ -46,11 +45,10 @@ def alphaBeta_ordering(board, alpha, beta, depth, is_maximising, model, scaler, 
         return value, best_move, nodes_explored
 
 
-def evaluate_move(move, board, model, scaler, feature):
-    board.push(move)
-    evaluation = predict_new_data_prob(board, model, scaler, feature).get(1,0)
-    board.pop()
-    return evaluation
+def evaluate_nb(board, model, scaler, feature):
+    preds = predict_new_data_prob(board, model, scaler, feature)
+    score = preds.get(1, 0) - preds.get(-1, 0)
+    return score
 
 
 def predict_new_data_prob(board, model, scaler, i):
