@@ -206,6 +206,24 @@ The two scores were then combined by taking the weighted sum of the two scores. 
 
 \section{Experiments}
 
+The main purpose of this project is to investigate the usefulness of applying Naive Bayes to minimax to add its evaluation. For this reason, the main evaluation is for the substitution and integration methods of MMNB. For this we could just rely on win rate against stockfish. However this may not give much insight to how well the algorithm is really doing. Many other metrics were used to assess the performance and effectiveness of each MMNB algorithm. 
+
+One such metric is \texttt{nodes\_explored}. This is the total number of nodes explored in the game tree for a specific move to be made. For this, the minimax algorithm had to be slightly adjusted to keep track of and return the number of nodes explored. This will give a good indication on how well the alpha-beta pruning is working. Another measurement included is the time it takes for each move to be calculated. This is a good indicator of the efficiency of the algorithms. 
+
+The previously mentioned features don't consider how well the algorithm is actually playing. For this 2 other metrics were considered, piece balance and mobility. Piece balance is the number of pieces white has over black, generally this shows who is currently winning. Mobility is the total number of legal moves, again this shows how much control of the board the player has, which is generally advantageous. For each move, the game state is analysed by stockfish to give a score of the board, where a positive value means white is most likely going to win and a negative value indicates black is more likely to win. These evaluations were also used to count blunders and good moves. Blunders are moves that cause the evaluation of stockfish to change negatively by 300 and good moves are moves that cause the evaluation of stockfish to change positively by 200.  
+
+To better test the performance of each algorithm, 2 opponents were used. The first being a random engine, this engine randomly picks legal moves with no incentive to win. The second opponent is stockfish, which was set at level 0. This level of stockfish isn't a grandmaster but understands how to win and can make decisions that favour it. For every game played, the games will be played against both opponents.
+
+The impact of the dataset and feature sets used was also investigated. Games played with both MMNB algorithms also used the different models initially trained. To remove any chance of random chance and luck, a total of 30 games were played for each configuration. For integration, the weight of Naive Bayes and a traditional evaluation will can be adjusted. For the purpose of this project, it was investigated how the change of this weighting can affect its performance by using Naive Bayes weightings of 0.25, 0.5 and 0.75. Considering this the total number of games played will be:
+
+Substitution: 3(datasets) x 4(features) x 2(opponents) x 30(games) = 720
+
+Integration: 3(datasets) x 4(features) x 3(weightings) x 2(opponents) x 30(games) = 2160
+
+Totalling a total of 2880 games to be played. This will give us a good overview of the performance of the algorithms and enough data to be able to have a strong understanding of how the different models affect the ability of the classifier to be able to classify. 
+
+
+
 
 % \section{Introduction}
 % As mentioned previously, the focus of this paper is to explore the uses of Naive Bayes in chess and how this could impact other domains in computer science. This chapter will mention the methodology that was used to implement the Naive Bayes classifier in the chess engine. 

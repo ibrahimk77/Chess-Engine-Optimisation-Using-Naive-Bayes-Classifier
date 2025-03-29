@@ -4,11 +4,12 @@
 \section{Chess}
 Modern chess is a game that has its origins in India, dating back to the 6th century 
 % [REFERENCE] 
-as a way of devising strategy and tactics in war. Today, this game is perceived as a benchmark for skill and intelligence, played by millions. Chess is an ideal candidate for AI research as it is a fully observable game, as both players can see everything related to the game state and the rules are well defined. Also there is no component of chance is the game, therefore the game state is only determined by the each players moves.
+as a way of devising strategy and tactics in war. Today, this game is perceived as a benchmark for skill and intelligence, played by millions. Given these roots in strategy, chess presents unique opportunities for AI research as it is a fully observable game, as both players can see everything related to the game state and the rules are well defined. Also there is no component of chance in the game, therefore the game state is only determined by each player's moves.
 
 
 \section{Search Algorithms}
-The most popular way to design a chess engine is by using a search algorithm. Commonly used is what is known as minimax. The concept of minimax was first proposed by Shannon in 1950 \cite{shannonXXIIProgrammingComputer1950}.
+
+The defeat of Garry Kasparov against IBM's Deep Blue marked a major turning point, demonstrating the effectiveness search algorithms in chess and accelerating research into more sophisticated search algorithms and evaluation techniques. Search algorithms are important in chess engines as they systematically explore potential future moves, allowing the engine to determine the most optimal move. Commonly used is what is known as minimax. The concept of minimax was first proposed by Shannon in 1950 \cite{shannonXXIIProgrammingComputer1950}.
 % [REFERENCE]
 It is used for zero-sum games which are games where if one player wins, the other player loses. The algorithm recursively alternates between the maximising player and the minimising player, until it reaches a terminal node. Then the algorithm backtracks to find the best moves for each player. The algorithm is shown below:
 
@@ -36,26 +37,122 @@ It is used for zero-sum games which are games where if one player wins, the othe
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-The issue with this algorithm is that the search tree it creates grows exponentially, so techniques to decrease the search space are used. Alpha-Beta pruning is a one such technique that is used to reduce the number of nodes that need to be evaluated. It does this by ignoring nodes that would not affect the final outcome of the algorithm. It introduces two new values, ${\alpha}$ and ${\beta}$, where ${\alpha}$ represents the maximum value that can be attained and ${\beta}$ represents the minimum value that can be attained. If the value of a node is less than ${\alpha}$ or greater than ${\beta}$, then the node is pruned. In best case scenario the algorithm only needs to evaluate ${O(b^{m/2})}$ nodes \cite{russellArtificialIntelligenceModern2022}, where ${b}$ is the branching factor and ${d}$ is the depth of the tree compared to ${O(b^m)}$ nodes with normal minimax. However, in the worst case scenario it doesn't help improve minimax at all.
+The issue with this algorithm is that the search tree it creates grows exponentially, so techniques to decrease the search space are used. Alpha-Beta pruning is one such technique that is used to reduce the number of nodes that need to be evaluated. It does this by ignoring nodes that would not affect the final outcome of the algorithm. It introduces two new values, ${\alpha}$ and ${\beta}$, where ${\alpha}$ represents the maximum value that can be attained and ${\beta}$ represents the minimum value that can be attained. If the value of a node is less than ${\alpha}$ or greater than ${\beta}$, then the node is pruned. In the best case scenario the algorithm only needs to evaluate ${O(b^{m/2})}$ nodes \cite{russellArtificialIntelligenceModern2022}, where ${b}$ is the branching factor and ${d}$ is the depth of the tree compared to ${O(b^m)}$ nodes with normal minimax. However, in the worst case scenario it doesn't help improve minimax at all. Since alpha-beta pruning always returns the same value as minimax and is much faster, it is always used over minimax alone.
 
 However, even with alpha-beta pruning, the search space for chess is still too large to evaluate in a reasonable amount of time.  This is why a Heuristic Alpha-Beta Tree Search is used, which is where the search is cut off early and apply a heuristic evaluation function to estimate which player is in the winning position. In chess engines what is usually used for this evaluation function is calculating the material balance, where each piece is given a value and the player with the higher value is currently "winning".
 
-The way to improve chess is one of two ways. The first is to increase the depth of the search tree, however this is generally dependant on the computational power of the machine so over time as computational power increases (if Moore's Law still holds) the depth of the search tree can increase. The second way is to improve the evaluation function, which is what this research paper focusses on. The primary way this is done is by using machine learning techniques. 
+The way to improve chess is one of two ways. The first is to increase the depth of the search tree, however this is generally dependent on the computational power of the machine so over time as computational power increases (if Moore's Law still holds) the depth of the search tree can increase. The second way is to improve the evaluation function, which is what this research paper focusses on. The primary way this is done is by using machine learning techniques. 
 
 \section{Naive Bayes}
-The most well-known chess engines are Stockfish and AlphaZero. AlphaZero, designed by DeepMind, uses a deep neural network in conjunction with reinforcement learning which allows it to teach itself how to play. Initially it has no understanding of the game other than the basic rules, then it plays against itself and uses the result of the game to update parameters in the neural network. Stockfish however uses a more traditional approach, utilising alpha-beta pruning with minimax with a evalutaion function that is based on numerous elements of the game. Recently it has also implemented a neural network to improve its evaluation function. However both these engines require a lot of computational power and also require a large dataset to generalise well, whereas Naive Bayes is a much simpler algorithm that requires less power and can generalise well even with a small dataset. This is the reason why this paper is concentrated on observing the impact of Naive Bayes on chess. This is because it is very simple and makes assumptions that are generally unrealistic, however it has been shown to be effective in domains like spam detection \cite{eberhardtBayesianSpamDetection2015} despite these simplistic assumptions. 
+
+Modern chess engines, such as AlphaZero and Stockfish, generally use complex neural networks and reinforcement learning algorithms. These methods are very effective however they require substantial computing power, large training data and long training times. On the other hand, Naive Bayes, due to its simple algorithm, provides a promising alternative that is more efficient. Its ability to generalise well even with small datasets and predict efficiently, makes it favourable for applications where fast evaluation and decision making is required. This paper explores whether the simplicity and efficiency of Naive Bayes can achieve comparable effectiveness to other machine learning techniques or whether this simplicity will not allow it to understand the intricacies of the game.
+
+% The most well-known chess engines are Stockfish and AlphaZero. AlphaZero, designed by DeepMind, uses a deep neural network in conjunction with reinforcement learning which allows it to teach itself how to play. Initially it has no understanding of the game other than the basic rules, then it plays against itself and uses the result of the game to update parameters in the neural network. Stockfish however uses a more traditional approach, utilising alpha-beta pruning with minimax with a evaluation function that is based on numerous elements of the game. Recently it has also implemented a neural network to improve its evaluation function. However, both these engines require a lot of computational power and also require a large dataset to generalise well, whereas Naive Bayes is a much simpler algorithm that requires less power and can generalise well even with a small dataset. This is the reason why this paper is concentrated on observing the impact of Naive Bayes on chess. This is because it is very simple and makes assumptions that are generally unrealistic, however it has been shown to be effective in domains like spam detection \cite{eberhardtBayesianSpamDetection2015} despite these simplistic assumptions. 
 % [MENTION SOMEWHERE THAT IS THE WORST CLASSIFIER IN HEAD TO HEAD COMPARISON]
 
-Naive Bayes, sometimes also known as Idiot Bayes or Simple Bayes, is a simple classification algorithm that is based upon Bayes' theorem (Equation~\ref{eq:bayestheorem}) \cite{lowdNaiveBayesModels2005}. 
+Naive Bayes, sometimes also known as Idiot Bayes or Simple Bayes, is a simple classification algorithm that is based upon Bayes' theorem, which is a fundamental principle that describes how new evidence can change the probability of an event (Equation~\ref{eq:bayestheorem}) .\cite{lowdNaiveBayesModels2005}. 
 
 \begin{equation}
     \label{eq:bayestheorem}
     P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
 \end{equation}
 
-It is referred to as naive as it assumes each input variable $X_1, X_2,..., X_n $ is conditionally independant given the class. Despite this assumption not being true in most cases, it still performs well in practise. This assumption allows probability distributions to be efficiently represented as the product of the individual probabilities of the the input variables (Equation~\ref{eq:naivebayes}) \cite{lowdNaiveBayesModels2005}.
+Where:
+\begin{itemize}
+    \item $P(A|B)$: Posterior Probability
+    \item $P(B|A)$: Likelihood
+    \item $P(A)$: Prior Probability
+    \item $P(B)$: Evidence Probability 
+\end{itemize} 
+
+Posterior probability is the probability of event A occurring after knowing new evidence B. Likelihood is the probability of evidence B happening given that event A is true. Prior probability is the probability of event A happening based on information we initially know before any new evidence. The prior probability of a class is given by the formula:
 
 \begin{equation}
-\label{eq:naivebayes}
-P(X_1, X_2, ..., X_n, C) ={P(C)}\cdot \prod_{i=1}^{n}{P(X_i | C)}
+    \label{eq:prior}
+    P(C) = \frac{N_c}{N}
 \end{equation}
+
+Where:
+\begin{itemize}
+    \item $P(C)$: Prior probability of class C
+    \item $N_c$: Number of instances of class C
+    \item $N$: Total number of instances
+\end{itemize}
+
+After calculating the priors for each class, the likelihoods of each feature need to be calculated. There are two main types of Naive Bayes classifiers, Multinomial and Gaussian. Multinomial Naive Bayes is primary used for situations where the features used are discrete which calculates the likelihood based on the count of each feature.
+
+\begin{equation}
+    \label{eq:multinomial}
+    P(X | C) = \frac{N_{X,C} + 1}{N_C + V}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $N_{X,C}$: Number of instances of the feature $X$ in class $C$
+    \item $1$: Laplace smoothing constant
+    \item $N_C$: Number of instances in class $C$
+    \item $V$: Number of possible values for $X$
+\end{itemize}
+
+
+Where continuous features are used, like within this project, Gaussian Naive Bayes is more suitable. Gaussian Naive Bayes calculates the likelihood, assuming the features are normally distributed. This is done by applying the following formula.
+
+\begin{equation}
+    \label{eq:gaussian}
+    P(X | C) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $x$: Feature value
+    \item $\sigma$: Standard deviation of the feature
+    \item $\mu$: Mean of the feature
+\end{itemize}
+
+The posterior probability for a class given a set of features $X_1, X_2,..., X_n $ is calculated using Bayes' theorem. Since Naive Bayes assumes that the features are conditionally independent given the class, allows the equation to be simplified to the product of the likelihoods \cite{lowdNaiveBayesModels2005}.
+
+\begin{equation}
+    \label{eq:posterior}
+    P(c | X) = \frac {P(c) \prod_{i=1}^{n} P(x_i | c)} {P(X)}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item $P(c | X)$: Posterior probability of class $c$ given features $X$
+    \item $P(c)$: Prior probability of class $c$
+    \item $P(x_i | c)$: Likelihood of feature $x_i$ given class $c$
+    \item $P(X)$: Evidence probability
+\end{itemize}
+
+Naive Bayes classifies new instances by choosing the class with the highest posterior probability for that given feature. Since $P(X)$ is the same for each, it can be removed when comparing the posterior probabilities.
+
+\begin{equation}
+    \label{eq:posterior}
+    P(c | X) \propto P(c) \prod_{i=1}^{n} P(x_i | c)
+\end{equation}
+
+So, the predicted class of an instance is chosen by the following formula:
+
+\begin{equation}
+    \label{eq:prediction}
+    \hat{y} = \arg\max_{c} P(c) \prod_{i=1}^{n} P(x_i | c)
+\end{equation}
+
+For this project, since many features will be used, when multiplying probabilities, it can result in very small numbers, causing underflow errors. To prevent this, the logarithm of the probabilities can be used, which allows the multiplications to be converted to additions.
+
+\begin{equation}
+    \label{eq:log}
+    \log(P(c | X)) \propto \log(P(c)) + \sum_{i=1}^{n} \log(P(x_i | c))
+\end{equation}
+
+A small constant $\epsilon$ is added to the likelihoods to prevent taking the logarithm of 0.
+
+As mentioned, Naive Bayes makes an unrealistic assumption that features are conditionally independent. In practice, especially in chess, this assumption rarely hold since the game states involves complex interactions between positions and pieces. A pieces value on the board is highly dependent on its position and other pieces on the board. Due to this impractical assumption, the model's accuracy could be 
+weakened. 
+
+
+
+% It is referred to as naive as it assumes each input variable $X_1, X_2,..., X_n $ is conditionally independant given the class. Despite this assumption not being true in most cases, it still performs well in practise. This assumption allows probability distributions to be efficiently represented as the product of the individual probabilities of the the input variables (Equation~\ref{eq:naivebayes}) \cite{lowdNaiveBayesModels2005}.
+
+
+
