@@ -14,6 +14,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import seaborn as sns
+sns.set_palette("Set1")
+
+
 # -------------------------------------------------------
 # 1) HELPER FUNCTIONS
 # -------------------------------------------------------
@@ -105,6 +109,7 @@ def plot_implementation_comparison(df):
     group = sub_df.groupby('implementation')[metrics].mean()
     
     group.plot(kind='bar', figsize=(8,5))
+
     plt.title('Implementation Comparison: Substitution vs Integration')
     plt.ylabel('Average Metric Value')
     plt.xticks(rotation=0)
@@ -303,43 +308,18 @@ def plot_nodes_vs_performance(df):
 
 def plot_implementation_comparison(df):
     """
-    1) First chart: Compare Substitution vs. Integration 
-       for 'avg_stockfish_evals' and 'avg_move_times'.
-
-    2) Second chart: Compare total (or average) number of blunders 
-       for Substitution vs. Integration, where a 'blunder' 
-       is a non-zero entry in the 'blunders' list.
+    Compare Substitution vs Integration across various metrics.
+    Uses 'avg_move_times', 'avg_stockfish_evals', and the computed 'mean_blunders'.
     """
-
-    # Filter for just substitution/integration
     sub_df = df[df['implementation'].isin(['substitution','integration'])].copy()
-
-    # ------------------------------
-    # (A) CHART: avg_stockfish_evals and avg_move_times
-    # ------------------------------
-    metrics = ['avg_stockfish_evals', 'avg_move_times']
-    group_metrics = sub_df.groupby('implementation')[metrics].mean()
-    group_metrics = group_metrics.sort_index()  # ensure consistent order
-
-    # Prepare x-axis
-    x_labels = group_metrics.index.tolist()
-    x = np.arange(len(x_labels))
-
-    # Extract each metric
-    evals_vals = group_metrics['avg_stockfish_evals']
-    times_vals = group_metrics['avg_move_times']
-
-    # We'll plot them as side-by-side bars
-    bar_width = 0.35
-
-    plt.figure(figsize=(8,5))
-    plt.bar(x - bar_width/2, evals_vals, width=bar_width, color='skyblue', label='avg_stockfish_evals')
-    plt.bar(x + bar_width/2, times_vals, width=bar_width, color='orange', label='avg_move_times')
-
-    plt.title('Implementation Comparison: Stockfish Eval & Move Times')
-    plt.xlabel('Implementation')
-    plt.ylabel('Value')
-    plt.xticks(x, x_labels)
+    metrics = ['avg_move_times', 'avg_stockfish_evals', 'mean_blunders']
+    group = sub_df.groupby('implementation')[metrics].mean()
+    
+    # For a Pandas plot you can pass the palette explicitly if needed:
+    group.plot(kind='bar', figsize=(8,5), color=sns.color_palette("Set1"))
+    plt.title('Implementation Comparison: Substitution vs Integration')
+    plt.ylabel('Average Metric Value')
+    plt.xticks(rotation=0)
     plt.legend(loc='best')
     plt.tight_layout()
     plt.show()
@@ -460,7 +440,7 @@ def plot_impl_vs_avg_blunder_value_whole(df):
     plt.bar(x, group_avg.values, color='green', alpha=0.7)
     plt.xlabel('Implementation')
     plt.ylabel('Average Non-Zero Blunder Value')
-    plt.title("Implementation vs. Average Non-Zero Blunder Value (Whole Games)")
+    plt.title("Implementation vs. Average Blunder Values")
     plt.xticks(x, x_labels)
     plt.tight_layout()
     plt.show()
@@ -603,8 +583,8 @@ def plot_avg_nonzero_blunders_per_game(df):
     plt.figure(figsize=(6,4))
     plt.bar(x, group.values, color='orange', alpha=0.7)
     plt.xlabel('Implementation')
-    plt.ylabel('Average Non-Zero Blunders per Game')
-    plt.title("Average Non-Zero Blunders per Game (Whole Games)")
+    plt.ylabel('Average number of Blunders')
+    plt.title("Average number of Blunders per Game")  
     plt.xticks(x, x_labels)
     plt.tight_layout()
     plt.show()
@@ -651,7 +631,7 @@ def plot_avg_confidence_whole_phase(df):
     plt.bar(x, group_conf.values, color='purple', alpha=0.75)
     plt.xlabel('Implementation')
     plt.ylabel('Average Confidence')
-    plt.title("Average Confidence per Game (Whole Games)")
+    plt.title("Average Confidence per Game")
     plt.xticks(x, x_labels)
     plt.tight_layout()
     plt.show()
@@ -716,8 +696,8 @@ def plot_avg_good_moves_whole_phase(df):
     plt.figure(figsize=(6,4))
     plt.bar(x, group_good.values, color='darkorange', alpha=0.75)
     plt.xlabel('Implementation')
-    plt.ylabel('Average Good Moves per Game')
-    plt.title("Average  Good Moves per Game")
+    plt.ylabel('Average Good Moves')
+    plt.title("Average Good Moves per Game")
     plt.xticks(x, x_labels)
     plt.tight_layout()
     plt.show()
@@ -937,10 +917,9 @@ def compute_feature_set_metrics(df):
     metrics = metrics.apply(pd.to_numeric, errors='coerce')
     
     return metrics
-
 def plot_feature_set_comparison_bar_chart(metrics):
     """
-    Given a DataFrame 'metrics' with index as feature_selection (e.g., '0' and '3') 
+    Given a DataFrame 'metrics' with index as feature_selection (e.g., '0', '1', etc.) 
     and columns as performance metrics:
       - Avg Move Time
       - Win Rate
@@ -961,15 +940,15 @@ def plot_feature_set_comparison_bar_chart(metrics):
     
     # Setup positions for the categories on the x-axis.
     x = np.arange(n_categories)
-    bar_width = 0.35  # Adjust as needed
+    bar_width = 0.8 / n_features  # allocate 80% of the space per category for bars
     
     plt.figure(figsize=(10,6))
     
     # For each feature set, plot a set of bars for all metrics.
     for i, feat in enumerate(feature_sets):
         values = metrics.loc[feat].values
-        # Offset the positions: centers are shifted so that each metric gets multiple bars.
-        offset = (i - n_features/2) * bar_width + bar_width/2
+        # Calculate offset so bars are centered in each group
+        offset = (i - (n_features - 1)/2) * bar_width
         plt.bar(x + offset, values, width=bar_width, label=f"Feature Set {feat}")
     
     plt.xticks(x, categories)
@@ -980,12 +959,295 @@ def plot_feature_set_comparison_bar_chart(metrics):
     plt.show()
 
 
+
+def plot_win_draw_loss_by_implementation(df):
+    """
+    Create a stacked bar chart (using percentages) of win/draw/loss for each implementation,
+    using a color-blind friendly palette.
+    """
+    result_mapping = {"1-0": "Win", "0-1": "Loss", "1/2-1/2": "Draw"}
+    df['result_mapped'] = df['result'].map(result_mapping).fillna(df['result'])
+    
+    counts = df.groupby(['implementation', 'result_mapped']).size().unstack(fill_value=0)
+    counts_pct = counts.div(counts.sum(axis=1), axis=0) * 100
+
+    # Use the Set1 palette for the bars:
+    palette = sns.color_palette("Set1")
+    counts_pct.plot(kind='bar', stacked=True, figsize=(8,6), color=palette)
+    plt.title("Game Outcomes by Implementation (Percentage)")
+    plt.xlabel("Implementation")
+    plt.ylabel("Percentage of Games (%)")
+    plt.legend(title="Result", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_win_draw_loss_by_opponent(df):
+    """
+    Create a stacked bar chart of win/draw/loss counts for each opponent.
+    """
+    result_mapping = {"1-0": "Win", "0-1": "Loss", "1/2-1/2": "Draw"}
+    df['result_mapped'] = df['result'].map(result_mapping).fillna(df['result'])
+    
+    # Group by opponent and the mapped result.
+    counts = df.groupby(['opponent', 'result_mapped']).size().unstack(fill_value=0)
+    
+    counts.plot(kind='bar', stacked=True, figsize=(8,6))
+    plt.title("Game Outcomes by Opponent")
+    plt.xlabel("Opponent")
+    plt.ylabel("Number of Games")
+    plt.legend(title="Result")
+    plt.tight_layout()
+    plt.show()
+
+def plot_win_draw_loss_by_impl_and_opponent(df):
+    """
+    Plots a stacked bar chart (with percentages) that compares game outcomes 
+    for each combination of implementation and opponent.
+    
+    A win is assumed to be "1-0", a loss "0-1", and a draw "1/2-1/2".
+    """
+    # Map the result strings to outcome categories.
+    result_mapping = {"1-0": "Win", "0-1": "Loss", "1/2-1/2": "Draw"}
+    df['result_mapped'] = df['result'].map(result_mapping).fillna(df['result'])
+    
+    # Group by implementation, opponent, and outcome; count the number of games.
+    grouped = df.groupby(['implementation', 'opponent', 'result_mapped']).size().reset_index(name='count')
+    
+    # For each (implementation, opponent) group, compute the total games.
+    grouped['total'] = grouped.groupby(['implementation', 'opponent'])['count'].transform('sum')
+    
+    # Calculate the percentage for each outcome.
+    grouped['percentage'] = grouped['count'] / grouped['total'] * 100
+    
+    # Pivot the DataFrame so that rows are (implementation, opponent) and columns are outcomes.
+    pivot = grouped.pivot_table(index=['implementation','opponent'], 
+                                columns='result_mapped', 
+                                values='percentage', 
+                                fill_value=0)
+    
+    # Plot the pivoted data as a stacked bar chart.
+    pivot.plot(kind='bar', stacked=True, figsize=(10, 6))
+    plt.ylabel("Percentage (%)")
+    plt.title("Game Outcomes (%) by Implementation and Opponent")
+    plt.legend(title="Outcome", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+    
+
+def plot_blunders_by_phase_and_implementation(df):
+    """
+    Plots the average number of non-zero blunders grouped by phase (opening, midgame, endgame, whole)
+    and implementation (e.g., 'substitution', 'integration').
+    
+    Assumes:
+      - df has a 'phase' column with values like 'opening', 'midgame', 'endgame', 'whole'.
+      - df has an 'implementation' column (e.g., 'substitution', 'integration').
+      - df has a 'blunders' column that is a list of numeric values (where 0 means no blunder at that move).
+    """
+
+    # 1) Helper to count non-zero blunders in a single game
+    def count_nonzero_blunders(blunder_list):
+        if isinstance(blunder_list, list):
+            return sum(1 for x in blunder_list if x != 0)
+        return np.nan
+
+    # 2) Create a new column with the number of non-zero blunders per game
+    df['nonzero_blunders'] = df['blunders'].apply(count_nonzero_blunders)
+
+    # 3) Group by (phase, implementation) and compute the mean of nonzero_blunders
+    grouped = df.groupby(['phase', 'implementation'])['nonzero_blunders'].mean().unstack('implementation')
+
+    # 4) Plot as a grouped bar chart
+    ax = grouped.plot(kind='bar', figsize=(8, 6))
+    ax.set_title("Average Number of Blunders by Phase and Implementation")
+    ax.set_xlabel("Phase")
+    ax.set_ylabel("Avg Blunders")
+    ax.legend(title="Implementation", loc="best")
+    plt.tight_layout()
+    plt.show()
+
+def plot_mobility_by_phase_and_implementation(df):
+    """
+    Plots the average mobility grouped by phase (opening, midgame, endgame, whole)
+    and implementation (e.g., 'substitution', 'integration').
+    
+    Assumes:
+      - df has a 'phase' column with values like 'opening', 'midgame', 'endgame', 'whole'.
+      - df has an 'implementation' column (e.g., 'substitution', 'integration').
+      - df has a 'mobilities' column that is a list of numeric values.
+    """
+    # 1) Helper to calculate average mobility in a single game
+    def calculate_avg_mobility(mobility_list):
+        if isinstance(mobility_list, list) and len(mobility_list) > 0:
+            return np.mean(mobility_list)
+        return np.nan
+
+    # 2) Create a new column with the average mobility per game
+    df['avg_game_mobility'] = df['mobilities'].apply(calculate_avg_mobility)
+
+    # 3) Group by (phase, implementation) and compute the mean of avg_game_mobility
+    grouped = df.groupby(['phase', 'implementation'])['avg_game_mobility'].mean().unstack('implementation')
+
+    # 4) Plot as a grouped bar chart
+    ax = grouped.plot(kind='bar', figsize=(8, 6))
+    ax.set_title("Average Mobility by Phase and Implementation")
+    ax.set_xlabel("Phase")
+    ax.set_ylabel("Avg Mobility")
+    ax.legend(title="Implementation", loc="best")
+    plt.tight_layout()
+    plt.show()
+
+def plot_piece_balance_by_phase_and_implementation(df):
+    """
+    Plots the average piece balance grouped by phase (opening, midgame, endgame, whole)
+    and implementation (e.g., 'substitution', 'integration').
+    
+    Assumes:
+      - df has a 'phase' column with values like 'opening', 'midgame', 'endgame', 'whole'.
+      - df has an 'implementation' column (e.g., 'substitution', 'integration').
+      - df has a 'piece_balances' column that is a list of numeric values.
+    """
+    # 1) Helper to calculate average piece balance in a single game
+    def calculate_avg_piece_balance(piece_balance_list):
+        if isinstance(piece_balance_list, list) and len(piece_balance_list) > 0:
+            return np.mean(piece_balance_list)
+        return np.nan
+
+    # 2) Create a new column with the average piece balance per game
+    df['avg_game_piece_balance'] = df['piece_balances'].apply(calculate_avg_piece_balance)
+
+    # 3) Group by (phase, implementation) and compute the mean of avg_game_piece_balance
+    grouped = df.groupby(['phase', 'implementation'])['avg_game_piece_balance'].mean().unstack('implementation')
+
+    # 4) Plot as a grouped bar chart
+    ax = grouped.plot(kind='bar', figsize=(8, 6))
+    ax.set_title("Average Piece Balance by Phase and Implementation")
+    ax.set_xlabel("Phase")
+    ax.set_ylabel("Avg Piece Balance")
+    ax.legend(title="Implementation", loc="best")
+    plt.tight_layout()
+    plt.show()
+def plot_avg_move_time_by_phase(df):
+    """
+    Draws a line graph with game phase on the x-axis and the average move time on the y-axis.
+    Two lines are plotted—one for 'substitution' and one for 'integration' implementations.
+    Assumes that the DataFrame has columns 'phase', 'implementation', and 'avg_move_times'.
+    """
+
+    # Define the desired phase order (excluding 'whole')
+    phase_order = ["opening", "midgame", "endgame"]
+
+    # Filter and keep only rows with phases in our order
+    df_filtered = df[df['phase'].isin(phase_order)].copy()
+    
+    # Group by phase and implementation, then compute the mean average move time
+    group = df_filtered.groupby(['phase', 'implementation'])['avg_move_times'].mean().reset_index()
+
+    # Convert phase to a categorical type with the defined order
+    group['phase'] = pd.Categorical(group['phase'], categories=phase_order, ordered=True)
+    group = group.sort_values('phase')
+
+    # Pivot the table: index = phase, columns = implementation, values = avg_move_times
+    pivot = group.pivot(index='phase', columns='implementation', values='avg_move_times')
+
+    # Plotting: each column (implementation) becomes a line
+    plt.figure(figsize=(8, 6))
+    for impl in pivot.columns:
+        plt.plot(pivot.index, pivot[impl], marker='o', label=impl)
+    plt.xlabel("Game Phase")
+    plt.ylabel("Average Move Time (seconds)")
+    plt.title("Average Move Time by Game Phase")
+    plt.legend(title="Implementation")
+    plt.tight_layout()
+    plt.show()
+
+def plot_avg_nodes_explored_by_phase(df):
+    """
+    Draws a line graph with game phase on the x-axis and the average nodes explored on the y-axis.
+    Two lines are plotted—one for 'substitution' and one for 'integration' implementations.
+    Assumes that the DataFrame has columns 'phase', 'implementation', and 'avg_nodes_explored'.
+    """
+
+
+    # Define the desired phase order (excluding 'whole')
+    phase_order = ["opening", "midgame", "endgame"]
+
+    # Filter and keep only rows with phases in our order.
+    df_filtered = df[df['phase'].isin(phase_order)].copy()
+    
+    # Group by phase and implementation and compute the mean of avg_nodes_explored.
+    group = df_filtered.groupby(['phase', 'implementation'])['avg_nodes_explored'].mean().reset_index()
+
+    # Convert phase to a categorical variable with the defined order.
+    group['phase'] = pd.Categorical(group['phase'], categories=phase_order, ordered=True)
+    group = group.sort_values('phase')
+
+    # Pivot the table so that rows are phases and columns are implementations.
+    pivot = group.pivot(index='phase', columns='implementation', values='avg_nodes_explored')
+
+    # Plot a line for each implementation.
+    plt.figure(figsize=(8, 6))
+    for impl in pivot.columns:
+        plt.plot(pivot.index, pivot[impl], marker='o', label=impl)
+    plt.xlabel("Game Phase")
+    plt.ylabel("Average Number of Nodes Explored")
+    plt.title("Average Nodes Explored by Game Phase")
+    plt.legend(title="Implementation")
+    plt.tight_layout()
+    plt.show()
+
+def plot_win_draw_loss_by_feature_set(df):
+    """
+    Create a stacked bar chart (using percentages) of win/draw/loss for each feature set,
+    using a color-blind friendly palette.
+    """
+    # Ensure feature_selection is treated as a string category
+    if 'feature_selection' in df.columns:
+        df['feature_selection'] = df['feature_selection'].astype(str)
+    else:
+        print("No feature_selection column found in the dataset")
+        return
+        
+    # Map the chess notation results to more readable categories
+    result_mapping = {"1-0": "Win", "0-1": "Loss", "1/2-1/2": "Draw"}
+    df['result_mapped'] = df['result'].map(result_mapping).fillna(df['result'])
+    
+    # Group by feature_selection and result_mapped, count occurrences
+    counts = df.groupby(['feature_selection', 'result_mapped']).size().unstack(fill_value=0)
+    
+    # Convert to percentages
+    counts_pct = counts.div(counts.sum(axis=1), axis=0) * 100
+
+    # Plot stacked bar chart
+    palette = sns.color_palette("Set1")
+    counts_pct.plot(kind='bar', stacked=True, figsize=(8,6), color=palette)
+    plt.title("Game Outcomes by Feature Set (Percentage)")
+    plt.xlabel("Feature Set")
+    plt.ylabel("Percentage of Games (%)")
+    plt.legend(title="Result", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+    plt.show()
+    
+    # Print actual values for reference
+    print("\nWin/Draw/Loss Rates by Feature Set:")
+    print("=" * 50)
+    for feature_set in counts_pct.index:
+        print(f"Feature Set {feature_set}:")
+        for result in counts_pct.columns:
+            print(f"  {result}: {counts_pct.loc[feature_set, result]:.1f}%")
+        print(f"  (Total games: {counts.loc[feature_set].sum()})")
+        print()
+
+
 # -------------------------------------------------------
 # 4) MAIN SCRIPT ENTRY POINT
 # -------------------------------------------------------
 
 def main():
     df = load_and_prepare_data('chess_results.csv')
+
 
     # plot_avg_blunders_whole_phase(df)    
 
@@ -994,22 +1256,59 @@ def main():
 
     # plot_combined_implementation_eval_blunders(df)
 
-    # plot_combined_same_scale(df) # happy
-    # plot_avg_nonzero_blunders_per_game(df) # happy
+    # plot_combined_same_scale(df) # happy DONE
+    # plot_avg_nonzero_blunders_per_game(df) # happy DONE
 
-    #plot_avg_confidence_whole_phase(df) # dont use confidence
+    # # # plot_avg_confidence_whole_phase(df) # dont use confidence
 
-    # plot_avg_mobility_whole_phase(df) # happy
-    # plot_avg_good_moves_whole_phase(df) # happy
+    # plot_avg_mobility_whole_phase(df) # happy DONE
+    # plot_avg_good_moves_whole_phase(df) # happy DONE
 
-    # plot_win_rate_nb_weight(df) # below agaisnt stockfish is better
+    # # # plot_win_rate_nb_weight(df) # below agaisnt stockfish is better
     # plot_win_rate_nb_weight_stockfish(df) # happy
 
-    # plot_radar_chart(compute_group_metrics(df)) #Doesnt look useful
+    # # # plot_radar_chart(compute_group_metrics(df)) #Doesnt look useful
 
-    #plot_opponent_comparison(df) # happy
+    # plot_opponent_comparison(df) # happy
 
     # plot_feature_set_comparison_bar_chart(compute_feature_set_metrics(df))   # happy
+
+    # small_metrics = ["Win Rate", "Avg Piece Balance", "Avg Move Time"]
+    # big_metrics = ["Avg Blunder Value", "Avg Mobility"]
+    # metrics = compute_feature_set_metrics(df)
+
+    # plot_feature_set_comparison_bar_chart(metrics[small_metrics]) # happy
+    # plot_feature_set_comparison_bar_chart(metrics[big_metrics]) # happy
+    # # Choose eihere one graoh or two graphs
+
+
+    # plot_win_draw_loss_by_implementation(df) #DONE
+    # # plot_win_draw_loss_by_opponent(df)
+    # plot_win_draw_loss_by_impl_and_opponent(df)
+
+    # plot_blunders_by_phase_and_implementation(df) # happy DONE
+
+
+    # plot_mobility_by_phase_and_implementation(df)
+    # plot_piece_balance_by_phase_and_implementation(df)
+
+
+    # plot_avg_move_time_by_phase(df)
+    # plot_avg_nodes_explored_by_phase(df)
+
+    plot_win_draw_loss_by_feature_set(df)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1027,7 +1326,7 @@ def main():
     #plot_feature_selection_comparison(df)
     
     # # 5. Dataset comparison (master vs beginner vs random)
-    plot_dataset_comparison(df)
+    #plot_dataset_comparison(df)
     
     # # 6. Phase comparison (whole, opening, midgame, endgame)
     # plot_phase_comparison(df)
@@ -1038,14 +1337,14 @@ def main():
     # # 8. Correlation matrix
     # plot_correlation_matrix(df)
     
-    # # 9. Time evolution of moves (example game)
-    # plot_time_move_evolution(df)
+    ## 9. Time evolution of moves (example game)
+    #plot_time_move_evolution(df)
     
     # # 10. Confidence usage
     # plot_confidence_usage(df)
     
     # # 11. Nodes vs. performance scatter plot
-    # plot_nodes_vs_performance(df)
+    #plot_nodes_vs_performance(df)
 
 if __name__ == '__main__':
     main()

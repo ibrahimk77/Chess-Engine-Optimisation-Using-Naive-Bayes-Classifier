@@ -1,406 +1,725 @@
-\pgfplotsset{compat=1.17} % adjust as needed
-
-
-\chapter{Results/Evaluation}
+\chapter{Results}
 
 
 \section{Naive Bayes Evaluation}
 
-The first experiment was to evaluate the Naive Bayes classifier on its own. The classifier was trained on around 10,000 games from the Lichess database. Then features were extracted as mentioned in the methodology section, eventually resulting in the following number of instances:
+Before evaluating the application of the Naive Bayes classifier in the chess engine, it is important to evaluate the classifier on its own. A total of 12 models were trained, including 3 different datasets and 4 different feature sets (labelled 0 to 3). Each model was trained on 300,000 games from the Lichess database. The results are summarised in Table \ref{tab:naive_bayes_evaluation}.
+
+% Dataset,model,f1,kappa,accuracy,recall,precision
+% master,0,0.5988536304236853,0.2112254147134801,0.6049062609492699,0.482094782209774,0.6439416616022197
+% beginner,0,0.6051249676934042,0.2210397399646341,0.609488133601887,0.5040674214143965,0.6466855707935595
+% random,0,0.6072031151366292,0.22365713746617322,0.6107085997032513,0.5156335065526249,0.646008464803797
+% master,1,0.605130502829087,0.21395189271532478,0.6066231824687036,0.5446936268591849,0.6257603246825858
+% beginner,1,0.6099898344486384,0.22289154075242434,0.610955667581852,0.5600284176270772,0.630317464411715
+% random,1,0.6113403483186637,0.22495286229881817,0.6119870906691742,0.569425141503181,0.6304191915229441
+% master,2,0.6085085653811569,0.21817535774911112,0.6089051908184601,0.5763088238844891,0.6202536271310867
+% beginner,2,0.6112343011853606,0.22422735972358465,0.611752390275514,0.5737754871653842,0.6274838694106847
+% random,2,0.6130669539707349,0.22692003179415388,0.6132139510830144,0.590906779230026,0.6260967043218012
+% master,3,0.6084997597868439,0.2172749652323428,0.6085624145434425,0.5947075103824608,0.6152391256154944
+% beginner,3,0.61155981712515,0.22315316162034304,0.6115478379550269,0.6072561711576363,0.6185306574839604
+% random,3,0.6124781405192362,0.2248037693959768,0.6124678472852909,0.6162927292084742,0.6187451294855816
+
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|}
+    \begin{tabular}{|c|c|c|c|c|c|c|}
     \hline
-    \textbf{Class} & \textbf{Count}  \\ \hline
-    Black wins             & 56826           \\ \hline
-    White wins              & 57940           \\ \hline
-    \end{tabular}
-    \caption{Naive Bayes Training Data}
-    \label{tab:naive_bayes_training_data}
-\end{table}
-
-
-
-
-This data was a good split of the two classes, removing the issue of class imbalance. Then this data was split into training and testing data.
- The classifier used the features as mention in the methodology section. After training, the classfier was tested on unseen data. The results are shown in the following table.
-
-% ???  Material balance, postion value, mobility, king attack, control pf cnetre small and large   ???
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    \textbf{Metric} & \textbf{Value}  \\ \hline
-    Accuracy        & 0.6080           \\ \hline
-    Precision       & 0.6254           \\ \hline
-    Recall          & 0.5481           \\ \hline
-    F1 Score        & 0.6066           \\ \hline
-    Kappa Score     & 0.2165           \\ \hline
+    \textbf{Dataset} & \textbf{Model} & \textbf{F1 Score} & \textbf{Kappa Score} & \textbf{Accuracy} & \textbf{Recall} & \textbf{Precision} \\ \hline
+    Master           & 0              & 0.5989            & 0.2112              & 0.6049            & 0.4821         & 0.6439            \\ \hline
+    Beginner         & 0              & 0.6051            & 0.2210              & 0.6095            & 0.5041         & 0.6467            \\ \hline
+    Random           & 0              & 0.6072            & 0.2237              & 0.6107            & 0.5156         & 0.6460            \\ \hline
+    Master           & 1              & 0.6051            & 0.2139              & 0.6066            & 0.5447         & 0.6258            \\ \hline
+    Beginner         & 1              & 0.6100            & 0.2229              & 0.6110            & 0.5600         & 0.6303            \\ \hline
+    Random           & 1              & 0.6113            & 0.2249              & 0.6120            & 0.5694         & 0.6304            \\ \hline
+    Master           & 2              & 0.6085            & 0.2182              & 0.6089            & 0.5763         & 0.6203            \\ \hline
+    Beginner         & 2              & 0.6112            & 0.2242              & 0.6118            & 0.5738         & 0.6275            \\ \hline
+    Random           & 2              & 0.6131            & 0.2269              & 0.6132            & 0.5909         & 0.6261            \\ \hline
+    Master           & 3              & 0.6085            & 0.2173              & 0.6086            & 0.5947         & 0.6152            \\ \hline
+    Beginner         & 3              & 0.6116            & 0.2232              & 0.6115            & 0.6073         & 0.6185            \\ \hline
+    Random           & 3              & 0.6125            & 0.2248              & 0.6125            & 0.6163         & 0.6187            \\ \hline
     \end{tabular}
     \caption{Naive Bayes Evaluation}
     \label{tab:naive_bayes_evaluation}
 \end{table}
 
-% Class -1: 56826
-% Class 1: 57940
-% Confusion Matrix: 
-% [[9542 4733]
-%  [6514 7903]]
-% F1 Score:  0.6066147073815372
-% Kappa Score:  0.21648061576292033
-% Accuracy:  0.6080092011710582
-% Recall:  0.5481722965942984
-% Precision:  0.6254352643241532
-% Model saved.
 
-The results show that the classifier doesn't perform very well. The accuracy is 0.0608 whcih is slightly better than randomly guessing which would have an accuracy of 0.5. This shows that the classifier is learning to some extent but not very well. The precision is 0.6254 and recall is 0.5481 whcihc suggests that the classifier is better at predicting the positive outcomes (white winning) than the negative outcomes (black winning). The F1 score shows that the calssifer is slightly effective but there is significant need to improve it, this is similarly shown by the low Kappa score.
+The average F1 value overall was 0.608 across the 12 different models. This shows that the classifier was able to learn some aspects of the game, however despite this, considering a random classifier would have an F1 score of 0.5, an F1 score of 0.608 is not very good. This is further supported by the Kappa score which averaged 0.221. This would come under the category of "fair agreement" according to Landis and Koch \cite{landisMeasurementObserverAgreement1977}, demonstrating that the classifier was able to understand some indicators of winning or losing positions. However the low Kappa and F1 scores reinforce the known limitations of Naive Bayes, particularly its reliance in the assumption of conditional independence. The models were not able to learn the complex relationships between the features and the result of the game, which is crucial in chess. This indicates that Naive Bayes is not suitable for applications where the results are highly dependent on feature interactions. An average accuracy of 0.610 highlights the model's ability to learn some patterns in the data. Precision is important in the context of chess since it reflects how often the model's predicted winning outcomes are correct. A low precision would mean the model may not consider safer moves, being led to make riskier decisions. A precision of 0.620 was obtained indicating the model's ability to identify winning positions. Recall is another important measure to consider in the context of chess. It reflects the the proportion of actual winning positions that were correctly identified by the model. A low recall could cause the engine to miss critical chances to press an advantage. The average recall was 0.561, indicating the model's poor ability to identify a good number of winning positions. 
 
-Using this classifier in the chess engine, it will not be very effective. However, the classifier was used in the minimax algorithm to see how it would perform. For this experiment, the classifier will completely replace the evaluation function. It is tested by playing against a random engine. 
+Another important aspect that is important to analyse is the influence of the feature selection on the performance of the model. Across the 12 models, the progression from feature set 0 and feature set 3 showed an increase in both F1 and recall. The average F1 score for feature set 0 was 0.604 increasing to 0.622 with feature set 3, reflecting a clear trend that more features yield better performance. This is consistent with the literature, like mentioned by Sahami et al. \cite{sahamiBayesianApproachFiltering} where the addition of hand-crafted features led to significant improvement,  and Rish on his analysis on Naive Bayes \cite{rishEmpiricalStudyNaive}. The average of recall from 0.500 to 0.618 also indicates the model's ability to identify winning positions improved with the addition of more features. This is an important result as it suggests that reliance on simplistic indicators like material balance and mobility alone is not sufficient to capture the complexity of chess. Another notable observation is the minimal performance difference between feature sets 2 and 3. Both feature sets obtained a F1 score of 0.612. This plateau indicates possible diminishing returns with the addition of more features. One possible explanation for this is that the added features, like king safety and castling rights, may be strongly correlated to existing features, leading to minimal information gain. Another explanation to this is that the model did not see enough examples of these features in play in the training data to learn their significance. These findings further reinforce that the performance of the Naive Bayes Classifier is not only dependent on the quantity of features but also on the quality of the features. The results also indicate that Naive Bayes may be limited in this context as the performance seems to reach a limit despite the increase in features and feature complexity, where more complex models may succeed. The small increase in feature set 2 and 3 could also imply that most of the useful information that the model uses for its predictions is from previous features like control of centre and pawn structure, this observation would not have been possible with a machine learning technique that is not interpretable like a neural network. 
 
-The results are shown in the following table:
 
-\begin{table}[H]
+In addition to feature selection, the dataset used to train the model has a noticeable impact on the predictive power of the classifier. What was interesting from this data, is that across all feature sets, the models trained on the random dataset consistently outperformed the models trained on the beginner and master datasets. This trend was shown by the F1 score and accuracy where, the random dataset obtained the highest f1 and accuracy scores, with an average of 0.611 and 0.612 respectively. Whereas the master dataset obtained the lowest f1 and accuracy scores, with an average 0.605 and 0.607 respectively. This result is surprising as what would be expected is that the master dataset would be more informative of good moves and winning positions. There are a number of reasons this result could have occurred. These results could be due to the nature of games in each dataset. In master-level games, there tend to be more complex positions and strategies, including more subtle positional considerations and more long term sacrificing and planning, which are difficult to learn in a probabilistic model like Naive Bayes. These complex reasonings for each move violate the assumption of feature independence, resulting in poorer generalisation. This is in contrast to the random dataset which would include a more variety of playing styles and patterns, which could be based on more straightforward principles like material balance which Naive Bayes can detect with better accuracy.
+
+
+\section{MMNB Analysis}
+
+To evaluate the performance of Naive Bayes in a minimax algorithm, two versions were compared. The first being MMNB integration which combines the Naive Bayes evaluation with a traditional evaluation function, and the second being MMNB substitution which completely replaces the evaluation function in the minimax algorithm. Several performance indicators were used to analyse the 2800 games played including mobility, blunder frequency and stockfish evaluations. These indicators provide a comprehensive understanding of the engine's ability in making strategic decisions by both implementations.
+
+
+The results between MMNB integration and MMNB substitution, reveal a much stronger performance from the MMNB integration. This is supported by the graph in Figure \ref{fig: implementation_vs_win_rate} as well as the raw values obtained.
+
+\begin{figure}[H]
     \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    Games Played        & 10           \\ \hline
-    Games Won           & 0           \\ \hline
-    Games Lost          & 0          \\ \hline
-    Games Drawn         & 10           \\ \hline
-    \end{tabular}
-    \caption{Naive Bayes Minimax Evaluation}
-    \label{tab:naive_bayes_minimax_evaluation}
-\end{table}
-
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.6270683887212173
-% {'white': 12, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.4504173964810518
-% {'white': 12, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 2.5669456181987638
-% {'white': 15, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.29698764215601553
-% {'white': 14, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 9.90118701374808
-% {'white': 11, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.4068801231633604
-% {'white': 13, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 34.30969068436396
-% {'white': 14, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.5967418224580826
-% {'white': 12, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.6973249771498227
-% {'white': 7, 'black': 1}
-% Minimax vs Random
-% 1/2-1/2
-% Average time taken for each move: 0.7988217406802707
-% {'white': 13, 'black': 1}
+    \includegraphics[width=0.8\textwidth]{images/plots/implementation/Implementation_vs_win_rate.png}
+    \caption{Game Outcomes of each Implementation}
+    \label{fig: implementation_vs_win_rate}
+\end{figure}
 
 
-% Same thing against stockfish:
+% ======================================================================  
+% OVERALL WIN/DRAW/LOSS RATES BY IMPLEMENTATION
+% ======================================================================  
+% integration (Total games: 8634):
+%   Win:  4378 games (50.7%)
+%   Draw: 84 games (1.0%)
+%   Loss: 4172 games (48.3%)
 
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.39859261363744736
-% {'white': 10, 'black': 12}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.3527978091012864
-% {'white': 12, 'black': 12}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.48027973071388574
-% {'white': 12, 'black': 11}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.5380149443944295
-% {'white': 14, 'black': 16}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.5493315855662028
-% {'white': 14, 'black': 15}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.4354696715319598
-% {'white': 12, 'black': 13}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.3905089473724365
-% {'white': 9, 'black': 7}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.4604063034057617
-% {'white': 14, 'black': 13}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.4611468519483294
-% {'white': 11, 'black': 12}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.4826975844123147
-% {'white': 10, 'black': 11}
-% {'1-0': 0, '0-1': 10, '1/2-1/2': 0}
+% substitution (Total games: 3840):
+%   Win:  1484 games (38.6%)
+%   Draw: 460 games (12.0%)
+%   Loss: 1896 games (49.4%)
 
-The results show that when the classifier is used on its own, it is unable to win any games against a random engine. This is what was predicted as it would be hard for the classifier to learn the nuances of chess. However what is interesting from the games is that even though every game was drawn, on average it had 12 more pieces than random. This indicates that the classifier understands that having more pieces is advantageous so tries to protect its pieces and also capture opponent pieces. The issue is, however, that it doesn't understand how to cause checkmates or how to protect its king, which is vital to winning a game.
 
-The engine that used Naive Bayes above was then also tested against Stockfish at level 0. The results are shown in the following table:
+% ======================================================================  
+% WIN/DRAW/LOSS RATES BY IMPLEMENTATION AND OPPONENT
+% ======================================================================  
 
-\begin{table}[H]
+% Opponent: random
+% --------------------------------------------------
+% integration (Total games: 4314):
+%   Win:  4290 games (99.4%)
+%   Draw: 24 games (0.6%)
+%   Loss: 0 games (0%)
+
+% substitution (Total games: 1920):
+%   Win:  1484 games (77.3%)
+%   Draw: 436 games (22.7%)
+%   Loss: 0 games (0%)
+
+
+% Opponent: stockfish
+% --------------------------------------------------
+% integration (Total games: 4320):
+%   Win:  88 games (2.0%)
+%   Draw: 60 games (1.4%)
+%   Loss: 4172 games (96.6%)
+
+% substitution (Total games: 1920):
+%   Win:  0 games (0%)
+%   Draw: 24 games (1.2%)
+%   Loss: 1896 games (98.8%)
+
+
+The integration implementation achieved a win rate of 50.7\%, with loses at 48.3\% and draws only at 1.0\%. In contrast, the substitution implementation achieved a win rate of 38.6\%, a similar loss rate of 49.4\% and a much higher draw rate of 12.0\%. This notable difference in draw rates suggests that MMNB substitution wasn't able to identify moves that would lead to wins even when in advantageous positions or the inability to identify crucial moves. 
+
+It is important to seek deeper insight into this pattern by comparing the results of the two implementations against both opponents, Stockfish and random engine. Against the random opponent, MMNB integration dominated, winning 99.4\% of the games and never losing. MMNB substitution, however, did do well but achieved a much lower win rate of 77.3\% and a much higher draw rate of 22.7\%. This contrast of win rates, indicate that even against a low-skill opponent, with no strategy, the substitution engine was much worse at converting advantages into wins.
+
+This is further supported by the games against Stockfish. MMNB integration was able to win 2.0\% of the games and draw 1.4\% of games whereas MMNB substitution failed to win even a single game, drawing only 1.2\% of the time and losing 98.8\% of the games. This highlights the limitation of the substitution implementation which is the evaluation function. The evaluation function which solely relies on the Naive Bayes probabilities, does not have the necessary understanding to win against a strong opponent. Despite being outperformed by Stockfish, the integration method showed that ability to exploit certain rare strategic opportunities, which is likely only due to the hybrid approach. These findings reinforce the hypothesis that Naive Bayes is best used as a supporting tool in a chess engine. The simplicity of the Naive Bayes classifier can provide some useful insights but is insufficient to be used as a standalone evaluation function.
+
+Figure \ref{fig: implementation_vs_win_rate} is a good indicator of the overall performance of both engines but does not provide an insight of the quality of moves and efficiency of the engines. One way to measure the quality of moves is to compare the stockfish evaluation after each move as well as the average value of the blunders made by each engine. The results are shown in Figure \ref{fig: implementation_vs_stockfish_eval_and_blunder_value}.
+
+\begin{figure}[H]
     \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    Games Played        & 10           \\ \hline
-    Games Won           & 0           \\ \hline
-    Games Lost          & 10          \\ \hline
-    Games Drawn         & 0           \\ \hline
-    \end{tabular}
-    \caption{Naive Bayes Minimax Evaluation Against Stockfish}
-    \label{tab:naive_bayes_minimax_evaluation_stockfish}
+    \includegraphics[width=0.8\textwidth]{images/plots/implementation/Implementation_vs_stockfish_eval_and_blunder_value.png}
+    \caption{Stockfish Evaluation and Blunder Value of each Implementation}
+    \label{fig: implementation_vs_stockfish_eval_and_blunder_value}
+\end{figure}
 
-\end{table}
+% ======================================================================  
+% AVERAGE STOCKFISH EVALUATION BY IMPLEMENTATION
+% ======================================================================  
+% integration: -340.02
 
-This was expected as if the engine couldn't win against a random engine, that has no strategy to its game play, it woudld be near to impossible to win against Stockfish. 
-% ??MAYBE compare time it takes for stockfish to beat random and the above classifier??
+%   By opponent:
+%     vs random: 2241.98
+%     vs stockfish: -2918.43
 
-The engine that used the naive bayes classifier above used a depth of 3 for the minimax algorithm. This is generally quite low for a chess engine. The same tests were run with the same Naive Bayes model but with a depth of 4 for the minimax algorithm. 
+% substitution: -1048.25
 
-The results are shown in the following table:
+%   By opponent:
+%     vs random: 1099.23
+%     vs stockfish: -3195.74
 
-\begin{table}[H]
+% ======================================================================
+% AVERAGE BLUNDER SEVERITY BY IMPLEMENTATION (ONLY NON-ZERO BLUNDERS)
+% ======================================================================
+% integration: -4693.34 (13690 blunders)
+
+%   By opponent:
+%     vs random: -4617.38 (6200 blunders)
+%     vs stockfish: -4756.22 (7490 blunders)
+
+% substitution: -2652.59 (34364 blunders)
+
+%   By opponent:
+%     vs random: -2423.47 (30988 blunders)
+%     vs stockfish: -4755.65 (3376 blunders)
+
+
+The Stockfish evaluation is a numerical representation of the the move quality, where a higher value indicates a better move. Figure \ref{fig: implementation_vs_stockfish_eval_and_blunder_value} that the MMNB integration engine had a higher average stockfish evaluation than the MMNB substitution engine, which is consistent with the conclusions obtained based on the win rates. MMNB integration had an average stockfish evaluation of -340.02, whereas MMNB substitution had an average stockfish evaluation of -1048.25. However what is interesting is the average blunder value of each implementation. A blunder was defined as a move that caused a decrease in the Stockfish evalutaion by 300, where a more negative value indicates a more severe blunder based on Stockfish's opinion. MMNB integration had an average blunder value of -4693.34, whereas MMNB substitution had an average blunder value of -2652.59. This suggests that even though MMNB integration was able to win more games, it made more severe blunders. This could suggest that the integration method played much more aggressive and making more risky moves. This would explain the higher win rate but also the much higher average blunder value. Whereas the substitution engine played much more conservatively and avoided making more riskier moves, which is why it had a lower win rate since it was unable to exploit certain opportunities. 
+
+% ======================================================================
+% AVERAGE NUMBER OF NON-ZERO BLUNDERS PER WHOLE GAME BY IMPLEMENTATION
+% ======================================================================
+% integration (2160 games): 3.17 non-zero blunders per game
+
+%   By opponent:
+%     vs random (1080 games): 2.87 non-zero blunders per game
+%     vs stockfish (1080 games): 3.47 non-zero blunders per game
+
+% substitution (960 games): 17.90 non-zero blunders per game
+
+%   By opponent:
+%     vs random (480 games): 32.28 non-zero blunders per game
+%     vs stockfish (480 games): 3.52 non-zero blunders per game
+
+As much as blunder value indicates that integration caused much more severe blunders, it is also important to consider the average number of blunders made by each implementation. Despite the average blunder value being lower for the substitution implementation, it made over 6 times more blunders per game than the integration implementation. MMNB integration had an average of 3.17 blunders per game whereas MMNB substitution had an average of 17.90 blunders per game. This shows that the substitution implementation was much more prone to blunders, despite having a much lower average blunder value. This further 
+confirms the theory that solely basing the evaluation function on the Naive Bayes classifier is detrimental to the engine's performance whereas a an approach that combines traditional methods and Naive Bayes can be much more fruitful.
+
+
+Two good indicators of the performance of the engines during different phases of the game, is mobility and piece balance. Piece balance meaning the difference in material between both players and mobility referring to the number of possible moves the player can make. Figure \ref{fig: implementation_vs_avg_piece_balance_and_phase } and \ref{fig: implementation_vs_avg_mobility_and_phase} show the average piece balance and mobility of each implementation over different phases of the game. The opening phase was defined by the first 25\% of the game, midgame phase was defined by the next 50\% of the game and endgame was defined by the last 25\% of the game.
+
+\begin{figure}[H]
     \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    Games Played        & 10           \\ \hline
-    Games Won           & 0           \\ \hline
-    Games Lost          & 10          \\ \hline
-    Games Drawn         & 0           \\ \hline
-    \end{tabular}
-    \caption{Naive Bayes Minimax Evaluation Depth 4}
-    \label{tab:naive_bayes_minimax_evaluation_depth_4}
-\end{table}
+    \includegraphics[width=0.8\textwidth]{images/plots/implementation/Implementation_vs_avg_piece_balance_and_phase.png}
+    \caption{Average Piece Balance per Game of each Implementation}
+    \label{fig: implementation_vs_avg_piece_balance_and_phase }
+\end{figure}
 
-It seems from these results that increasing the depth of the minimax algorithm didn't improve the performance of the engine. This further suggests that the issue is with the evaluation function that solely relies upon the classfier. Another observation from this is that the time taken for each move is about double compared to when the depth was 3, which is expected as the search tree is much larger. 
 
-A minimax algorithm with alpha beta pruning using traditional evaluation function was also implemented, to be used as a benchamark as well. The evaluation only considered the material balance and the positinal value of pieces. The same tests wiere conducted with a depth of 3. The results against the random engine are shown below:
 
-\begin{table}[H]
+
+% ======================================================================
+% AVERAGE PIECE BALANCE BY PHASE AND IMPLEMENTATION  
+% ======================================================================
+% implementation  integration  substitution
+% phase
+% endgame            1.119188     -0.716872
+% midgame            0.769215     -0.198002
+% opening            0.126352      0.071598
+% whole              0.722590     -0.267395
+
+Figure \ref{fig: implementation_vs_avg_piece_balance_and_phase } shows that the integration method always had a higher piece balance than the substitution method across all the different game phases. MMNB integration achieved an average piece balance of 0.723, indicating the engine's understanding of the importance of having material advantage over the opponent. On the other hand, MMNB substitution has an average piece balance of -0.267, indicating that the engine was often at a material disadvantage. The integration implementation consistently outperformed the substitution implementation in piece balance across all game phases. Both implementations, in the opening phase, had similar positive piece balances indicating their understanding of the importance of material advantage. However during midgame and end game, MMNB integration considerably outperformed the substitution implementation, achieving an average piece balance of 0.769 and 1.119 respectively, whereas the substitution implementation had an average piece balance of -0.198 and -0.716 respectively. This highlights the integration method's ability to preserve and accumulate material advantage, across different stages. These observations suggest that combining Naive Bayes with a classical evaluation function supports better piece management and leads to fewer unfavourable trades. Conversely, reliance purely on Naive Bayes 
+leads to more frequent disadvantageous exchanges, decreasing overall material count over time which is critical in the midgame and endgame phases. The hybrid approach evidently takes 
+advantage of core chess principles, while still benefiting from probabilistic insights, resulting in higher piece balance and overall performance.
+
+\begin{figure}[H]
     \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    Games Played        & 10           \\ \hline
-    Games Won           & 10           \\ \hline
-    Games Lost          & 0          \\ \hline
-    Games Drawn         & 0          \\ \hline
-    \end{tabular}
-    \caption{Traditional Minimax Evaluation Depth 4}
-    \label{tab:traditional_minimax_evaluation_depth_4}
-\end{table}
+    \includegraphics[width=0.8\textwidth]{images/plots/implementation/Implementation_vs_avg_mobility_and_phase.png}
+    \caption{Average Mobility per Game of each Implementation}
+    \label{fig: implementation_vs_avg_mobility_and_phase}
+\end{figure}
 
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.0666329374118727        
-% {'white': 16, 'black': 2}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.06544745432866084       
-% {'white': 13, 'black': 1}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.05950805346171061       
-% {'white': 16, 'black': 13}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.06503064204484989       
-% {'white': 14, 'black': 9}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.05323359274095105       
-% {'white': 14, 'black': 8}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.06438876020497289       
-% {'white': 15, 'black': 10}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.073584846548132
-% {'white': 16, 'black': 10}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.05293229103088379       
-% {'white': 16, 'black': 11}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.0306335234306228        
-% {'white': 13, 'black': 3}
-% Minimax vs Random
-% 1-0
-% Average time taken for each move: 0.04358914920261928       
-% {'white': 14, 'black': 7}
-% {'1-0': 10, '0-1': 0, '1/2-1/2': 0}
+% ======================================================================
+% AVERAGE MOBILITY BY PHASE AND IMPLEMENTATION       
+% ======================================================================
+% implementation  integration  substitution
+% phase
+% endgame           28.583730     21.022493
+% midgame           36.500683     30.159101
+% opening           32.733946     31.481510
+% whole             33.752626     28.199893
 
-What is interesting from these results is that the traditional algorithm was able to win all games, whereas the Naive Bayes algorithm was unable to win any games. Shown below is the algorithm against Stockfish at level 0.
 
-\begin{table}[H]
+Mobility is measured by the average number of legal moves available at each turn. In chess theory, a higher mobility correlates with better board control, increasing tactical opportunities. Again, the integration method consistently surpassed the substitution method in mobility across all game phases. 
+Overall, MMNB integration achieved an average mobility of 33.75 whereas MMNB substitution achieved an average mobility of 28.20, a gap of about 5.55 moves. In the opening, the average mobility is very similar inidicating similar strategies by both implementations. However, in midgame, where there is more complexity and opportunities since there are still a lot of pieces but are more developed. Integration has a higher mobility by about 6.34 moves (36.50 vs 30.16). This result was further amplified in the endgame where integration had an average mobility of 28.58 compared to 21.02 of the substitution implementation, a difference of 7.56 moves. Endgames require more precise and calculated moves minimising mistakes. This difference between the two indicates that MMNB substitution often causes pieces to move into more restricted or disadvantageous positions, while integration retains better piece coordination and mobility. There are a number of points that can be learnt from these results. Firstly, the integration method's superior mobility suggests it aims to avoid cramped locations and favour open positions, which is crucial throughout the game. MMNB substitution is strictly relying upon the assumption of feature independence. In the domain of chess where all features of the game are interdependent, it can lead to suboptimal decisions. The integration method's ability to combine the strengths of both Naive Bayes and traditional evaluation functions allows it to better navigate the complexities of chess, leading to improved mobility. These findings corroborate what has been concluded from previous metric results, indicating that pure Naive Bayes is less effective in understanding the nuances of the board while a hybrid approach preserves strategic principles and enhances mobility.
+
+So far what has been assessed between the two implementations is different metrics to assess the performance of the engine. Another factor that is important to consider is the the time taken to make each move as if it is to be used in real time, it is important that it is able to make decisions in a reasonable time period. Figure \ref{fig: implementation_vs_avg_move_time_and_phase} shows the average time taken to make each move across the different phases of the game.
+
+\begin{figure}[H]
     \centering
-    \begin{tabular}{|c|c|}
-    \hline
-    Games Played        & 10           \\ \hline
-    Games Won           & 1           \\ \hline
-    Games Lost          & 9          \\ \hline
-    Games Drawn         & 0           \\ \hline
-    \end{tabular}
-    \caption{Traditional Minimax Evaluation Against Stockfish}
-    \label{tab:traditional_minimax_evaluation_stockfish}
-\end{table}
+    \includegraphics[width=0.8\textwidth]{images/plots/implementation/Implementation_vs_avg_move_time_and_phase.png}
+    \caption{Average Time Taken to Make Each Move of each Implementation}
+    \label{fig: implementation_vs_avg_move_time_and_phase}
+\end{figure}
 
-Here the algorithm is at least able to win 10\% of the time against Stockfish. However, when the depth of the algorithm is increased from 3 to 4, the algorithm is able to win 50\% of the time. This shows the importance of the depth used and, the significant impact it can have on the performance of an engine. However what is also important to note is the time taken to make a move increased 10 fold. 
+% Average Move Time by Phase and Implementation:
+%      phase implementation  avg_move_times
+% 0  opening    integration        1.489163
+% 1  opening   substitution        1.846336
+% 2  midgame    integration        1.522826
+% 3  midgame   substitution        1.580211
+% 4  endgame    integration        0.827023
+% 5  endgame   substitution        0.801537
+% 6    whole    integration        1.334166
+% 7    whole   substitution        1.444066
 
-% Hello from the pygame community. https://www.pygame.org/contribute.html
-% Minimax vs Stockfish
-% 1-0
-% Average time taken for each move: 0.34663150665607856       
-% {'white': 12, 'black': 6}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.27326902250448865       
-% {'white': 6, 'black': 5}
-% Minimax vs Stockfish
-% 1-0
-% Average time taken for each move: 0.7042390436365984        
-% {'white': 10, 'black': 5}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.23526499227241235       
-% {'white': 5, 'black': 3}
-% Minimax vs Stockfish
-% 1-0
-% Average time taken for each move: 0.1439740037264889        
-% {'white': 11, 'black': 1}
-% Minimax vs Stockfish
-% 1-0
-% Average time taken for each move: 0.18150691266329783       
-% {'white': 12, 'black': 4}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.342784122987227
-% {'white': 5, 'black': 5}
-% Minimax vs Stockfish
-% 1-0
-% Average time taken for each move: 0.6357292710689076        
-% {'white': 12, 'black': 4}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.4371111918303926        
-% {'white': 6, 'black': 8}
-% Minimax vs Stockfish
-% 0-1
-% Average time taken for each move: 0.3347185233543659        
-% {'white': 10, 'black': 10}
-% {'1-0': 5, '0-1': 5, '1/2-1/2': 0}
+The horizontal x-axis shows reflects the different phases of the game. The overall average time taken to make a move for MMNB integration was 1.334 seconds in comparison to 1.444 seconds for MMNB substitution. This indicates the integration method was able to make decisions faster than the substitution method. This is an important result as it hightlights that MMNB integration is not only more effective in winning games but also is more efficient in making decisions. In the opening phase, substitution has the longest move time at 1.846 seconds, which is 0.36 seconds longer than integration. This suggests that the pure Naive Bayes evaluation requires more computational effort or more likely, struggles to prune effectively early on. This is likely due to the fact that the opening phase there are many more pieces so a lot more possible moves, requiring more time to evaluate moves. In midgame the overall time taken to make a move decreases in both methods to 1.522 seconds for integration and 1.580 seconds for substitution. During the midgame phase, the complexity of the game increases however the overall number of pieces on the board decreases, which would require less time to evaluate moves. In the endgame phase, both engines drop below 1 second, with integration taking 0.827 seconds and substitution taking 0.801 seconds. This is expected as during endgame there are much less pieces on the board, reducing the branching factor of the search tree. Substitution is slightly faster than integration in the endgame phase,  but this is most likely due to what was discussed earlier and that substitution on average has less material on the board, resulting in less possible moves, requiring less time to evaluate. In the openinng and midgame phases, the substitution method seems to either take longer to evaluate moves or is less efficient in pruning the search tree. As the game progresses, there are less pieces and opportunities to make moves, narrowing the difference between the two implementations. Another important observation to note is the efficiency vs. effectiveness of the two implementations. Generally, an increase in one, causes a decrease in the other however the data shows otherwise. While substitution invests more time in evaluating moves, it is still not able to outperform integration, suggesting that longer computation time doesn't necessarily result in better moves. 
 
-
-
-\section{Naive Bayes with Traditional Evaluation Function}
-
-Based on the results above, it is clear that the traditional evaluation function does much better than the one that uses the Naive Bayes classifier. However, it was shown that the Naive Bayes does understand some aspects that are important like material balance. Therefore, the next experiment wants to explore the idea of whether the Naive Bayes classfier can help support the traditional evaluation function. 
-
-TODO:FINISH
-
-\section{Influence of Feature Selection}
-
-The features used to train a model are crucial to the perfomance of the model. This is the only picture of the world that the model has. The better the features, the more realistic picture it has of the world. The features used previously when trained with 10,000 games seemed to only yield an F1 score of 0.6, which is not much better than random guessing. The next experiment investigates the impact of feature selection on the performace of the model.
-Therefore the same model was trained with the same number of games but with different features. 
-All the models were trained with 100,000 games and the features used for each model are shown below:
-
-\begin{itemize}
-    \item Model 0: Was restricted on only using material balance, positional value, mobility, king attack, as features
-    \item Model 1: Same as Model 0 but also considred the control of the centre. This was 2 seperate features, one for number of pieces in the 
-    2 by 2 square in the centre and the other for the 4 by 4 square in the centre.
-    \item Model 2: Same as Model 1 but also considered the structure of pawns. This was determined by the number of isolated pawns and doubles pawns. This equated to 4 more features, 2 for each colour.
-    \item Model 3: Same as Model 2 but included more complex features. One being the castling rights of each player as well as a way to determine the game phase, either beginning, middle or end game. Another feature this model considered was king safety and this was determined by the number of pawns around the king as well as number of attacks on sqaures adjacent to the king.
-\end{itemize}
-
-\begin{table}[h]
+\begin{figure}[H]
     \centering
-    \caption{Model Performance Metrics}
-    \begin{tabular}{lccccc}
-        \toprule
-        Model  & F1 Score & Kappa Score & Accuracy & Recall & Precision \\
-        \midrule
-        Model 0 & 0.60398  & 0.22042  & 0.60914  & 0.49486  & 0.64928  \\
-        Model 1 & 0.60943  & 0.22190  & 0.61047  & 0.55795  & 0.62995  \\
-        Model 2 & 0.61158  & 0.22456  & 0.61198  & 0.57858  & 0.62618  \\
-        Model 3 & 0.61263  & 0.22513  & 0.61264  & 0.61920  & 0.61678  \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+    \includegraphics[width=0.8\textwidth]{images/plots/implementation/Implementation_vs_avg_nodes_explored_and_phase.png}
+    \caption{Average Nodes Explored per Game of each Implementation}
+    \label{fig: implementation_vs_avg_nodes_explored_and_phase}
+\end{figure}
 
-% $ python training.py
-% Class -1: 1113075
-% Class 1: 1137649
-% Confusion Matrix: 
-% [[201851  76108]
-%  [143824 140899]]
-% F1 Score:  0.6039803401379297
-% Kappa Score:  0.22041543437430355
-% Accuracy:  0.6091362439175235
-% Recall:  0.49486342866575583
-% Precision:  0.6492832028459912
-% Model0 saved.
-% Class -1: 1113075
-% Class 1: 1137649
-% Confusion Matrix: 
-% [[184639  93320]
-%  [125863 158860]]
-% F1 Score:  0.6094330510221935
-% Kappa Score:  0.2219042268569834
-% Accuracy:  0.6104673687802347
-% Recall:  0.5579457929285656
-% Precision:  0.6299468633515742
-% Model1 saved.
-% Class -1: 1113075
-% Class 1: 1137649
-% Confusion Matrix: 
-% [[179613  98346]
-%  [119987 164736]]
-% F1 Score:  0.6115831460689735
-% Kappa Score:  0.2245609499676403
-% Accuracy:  0.6119779911210951
-% Recall:  0.5785833950892622
-% Precision:  0.6261773895591488
-% Model2 saved.
-% Class -1: 1113075
-% Class 1: 1137649
-% Confusion Matrix: 
-% [[168420 109539]
-%  [108422 176301]]
-% F1 Score:  0.6126283382210077
-% Kappa Score:  0.22512926687487078
-% Accuracy:  0.6126391105455657
-% Recall:  0.6192018207169776
-% Precision:  0.6167821158690177
-% Model3 saved. 
+% Average Nodes Explored by Phase and Implementation:
+%      phase implementation  avg_nodes_explored
+% 0  opening    integration         2339.930400
+% 1  opening   substitution         2910.269032
+% 2  midgame    integration         2406.379927
+% 3  midgame   substitution         2596.181826
+% 4  endgame    integration         1343.829285
+% 5  endgame   substitution         1411.950722
+% 6    whole    integration         2114.515511
+% 7    whole   substitution         2366.398302
 
-These results subtly show that the more features considered, the better the model generally performs, proven by the increase in F1 score from 0.603 for Model 0 to 0.613 for model 3. This supports the idea that the more information given to the model, the more it can understand about world. However the increase in model accuracy is very small that if an F1 score of 0.7 is aimed for, more than 150 features would be required. This is not feasible as during real time play, the engine would take too long to extract these features in order to make a move. The problems of misclassifying could be down to two factors, the first being the features used are not complex enough and not extracting enough nuances in the game that the model requires. However increase complexity of features would result in an engine that is much slower and not feasible to be used for real time game play. The second factor could be that the model is not complex enough to understand the intricacies of chess and therefore its unable to learn the patterns that grandmasters make to win games.
+Figure \ref{fig: implementation_vs_avg_nodes_explored_and_phase} shows the average number of nodes evaluated during the search of the game trees. The general trend is that the average number of nodes explored decreases as the game progresses. Similar to average time taken to make a move, this is expected as the number of pieces on the board decreases, reducing the branching factor of the search tree. The average number of nodes explored by MMNB integration was 2115 whereas the average number of nodes explored by MMNB substitution was 2366. In the opening phase, substitution explored 2910 nodes on average compared to 2339 for integration. This difference of 571 nodes indicates that the substitution method was less efficient in pruning the search tree, affirming the earlier observation that substitution takes longer to evaluate moves. The number of nodes explored closer to endgame is much closer between the two implementations. These results point towards the success of the hybrid approach in effectively pruning the search tree, leading to a more efficient evaluation process due ot the insight it gains from both the Naive Bayes classifier and the traditional evaluation function. 
+
+These two figures show that MMNB substitution contiuously spends more time and searches more nodes in early phases of the game but despite this still fails to yield better results than MMNB integration. This pattern reinforces that combining Naive Bates with standard heuristics genreally results a more efficient and reliable approach to the minimax search over exclusively relying on Naive Bayes, particularly during opening phases.
+
+
+\section{Feature Selection Analysis}
+
+The feature sets were designed to be progressively more complex, with the aim of evaluating the impact of feature selection on the performance of the Naive Bayes classifier. The results from the previous section show that the addition of more features generally leads to better performance. However it is also important to see their impact on the gameplay of the engine. Figure \ref{fig: feature_set_vs_win_rate} shows the overall performance of each feature set in terms of wins, draws and losses.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/plots/featureSet/Feature_set_vs_win_rate.png}
+    \caption{Game Outcomes of each Feature Set}
+    \label{fig: feature_set_vs_win_rate}
+\end{figure}
+
+
+
+% Feature Set 0:
+%   Draw: 3.3%
+%   Loss: 48.6%
+%   Win: 48.1%
+%   (Total games: 3360)
+
+% Feature Set 1:
+%   Draw: 3.9%
+%   Loss: 48.2%
+%   Win: 47.9%
+%   (Total games: 2874)
+
+% Feature Set 2:
+%   Draw: 3.6%
+%   Loss: 48.8%
+%   Win: 47.6%
+%   (Total games: 2880)
+
+% Feature Set 3:
+%   Draw: 6.4%
+%   Loss: 49.0%
+%   Win: 44.5%
+%   (Total games: 3360)
+
+
+
+
+
+
+
+
+
+% % \pgfplotsset{compat=1.17} % adjust as needed
+
+
+
+
+
+
+% % \chapter{Results/Evaluation}
+
+
+% % \section{Naive Bayes Evaluation}
+
+% % The first experiment was to evaluate the Naive Bayes classifier on its own. The classifier was trained on around 10,000 games from the Lichess database. Then features were extracted as mentioned in the methodology section, eventually resulting in the following number of instances:
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     \textbf{Class} & \textbf{Count}  \\ \hline
+% %     Black wins             & 56826           \\ \hline
+% %     White wins              & 57940           \\ \hline
+% %     \end{tabular}
+% %     \caption{Naive Bayes Training Data}
+% %     \label{tab:naive_bayes_training_data}
+% % \end{table}
+
+
+
+
+% % This data was a good split of the two classes, removing the issue of class imbalance. Then this data was split into training and testing data.
+% %  The classifier used the features as mention in the methodology section. After training, the classfier was tested on unseen data. The results are shown in the following table.
+
+% % % ???  Material balance, postion value, mobility, king attack, control pf cnetre small and large   ???
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     \textbf{Metric} & \textbf{Value}  \\ \hline
+% %     Accuracy        & 0.6080           \\ \hline
+% %     Precision       & 0.6254           \\ \hline
+% %     Recall          & 0.5481           \\ \hline
+% %     F1 Score        & 0.6066           \\ \hline
+% %     Kappa Score     & 0.2165           \\ \hline
+% %     \end{tabular}
+% %     \caption{Naive Bayes Evaluation}
+% %     \label{tab:naive_bayes_evaluation}
+% % \end{table}
+
+% % % Class -1: 56826
+% % % Class 1: 57940
+% % % Confusion Matrix: 
+% % % [[9542 4733]
+% % %  [6514 7903]]
+% % % F1 Score:  0.6066147073815372
+% % % Kappa Score:  0.21648061576292033
+% % % Accuracy:  0.6080092011710582
+% % % Recall:  0.5481722965942984
+% % % Precision:  0.6254352643241532
+% % % Model saved.
+
+% % The results show that the classifier doesn't perform very well. The accuracy is 0.0608 whcih is slightly better than randomly guessing which would have an accuracy of 0.5. This shows that the classifier is learning to some extent but not very well. The precision is 0.6254 and recall is 0.5481 whcihc suggests that the classifier is better at predicting the positive outcomes (white winning) than the negative outcomes (black winning). The F1 score shows that the calssifer is slightly effective but there is significant need to improve it, this is similarly shown by the low Kappa score.
+
+% % Using this classifier in the chess engine, it will not be very effective. However, the classifier was used in the minimax algorithm to see how it would perform. For this experiment, the classifier will completely replace the evaluation function. It is tested by playing against a random engine. 
+
+% % The results are shown in the following table:
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     Games Played        & 10           \\ \hline
+% %     Games Won           & 0           \\ \hline
+% %     Games Lost          & 0          \\ \hline
+% %     Games Drawn         & 10           \\ \hline
+% %     \end{tabular}
+% %     \caption{Naive Bayes Minimax Evaluation}
+% %     \label{tab:naive_bayes_minimax_evaluation}
+% % \end{table}
+
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.6270683887212173
+% % % {'white': 12, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.4504173964810518
+% % % {'white': 12, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 2.5669456181987638
+% % % {'white': 15, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.29698764215601553
+% % % {'white': 14, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 9.90118701374808
+% % % {'white': 11, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.4068801231633604
+% % % {'white': 13, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 34.30969068436396
+% % % {'white': 14, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.5967418224580826
+% % % {'white': 12, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.6973249771498227
+% % % {'white': 7, 'black': 1}
+% % % Minimax vs Random
+% % % 1/2-1/2
+% % % Average time taken for each move: 0.7988217406802707
+% % % {'white': 13, 'black': 1}
+
+
+% % % Same thing against stockfish:
+
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.39859261363744736
+% % % {'white': 10, 'black': 12}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.3527978091012864
+% % % {'white': 12, 'black': 12}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.48027973071388574
+% % % {'white': 12, 'black': 11}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.5380149443944295
+% % % {'white': 14, 'black': 16}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.5493315855662028
+% % % {'white': 14, 'black': 15}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.4354696715319598
+% % % {'white': 12, 'black': 13}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.3905089473724365
+% % % {'white': 9, 'black': 7}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.4604063034057617
+% % % {'white': 14, 'black': 13}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.4611468519483294
+% % % {'white': 11, 'black': 12}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.4826975844123147
+% % % {'white': 10, 'black': 11}
+% % % {'1-0': 0, '0-1': 10, '1/2-1/2': 0}
+
+% % The results show that when the classifier is used on its own, it is unable to win any games against a random engine. This is what was predicted as it would be hard for the classifier to learn the nuances of chess. However what is interesting from the games is that even though every game was drawn, on average it had 12 more pieces than random. This indicates that the classifier understands that having more pieces is advantageous so tries to protect its pieces and also capture opponent pieces. The issue is, however, that it doesn't understand how to cause checkmates or how to protect its king, which is vital to winning a game.
+
+% % The engine that used Naive Bayes above was then also tested against Stockfish at level 0. The results are shown in the following table:
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     Games Played        & 10           \\ \hline
+% %     Games Won           & 0           \\ \hline
+% %     Games Lost          & 10          \\ \hline
+% %     Games Drawn         & 0           \\ \hline
+% %     \end{tabular}
+% %     \caption{Naive Bayes Minimax Evaluation Against Stockfish}
+% %     \label{tab:naive_bayes_minimax_evaluation_stockfish}
+
+% % \end{table}
+
+% % This was expected as if the engine couldn't win against a random engine, that has no strategy to its game play, it woudld be near to impossible to win against Stockfish. 
+% % % ??MAYBE compare time it takes for stockfish to beat random and the above classifier??
+
+% % The engine that used the naive bayes classifier above used a depth of 3 for the minimax algorithm. This is generally quite low for a chess engine. The same tests were run with the same Naive Bayes model but with a depth of 4 for the minimax algorithm. 
+
+% % The results are shown in the following table:
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     Games Played        & 10           \\ \hline
+% %     Games Won           & 0           \\ \hline
+% %     Games Lost          & 10          \\ \hline
+% %     Games Drawn         & 0           \\ \hline
+% %     \end{tabular}
+% %     \caption{Naive Bayes Minimax Evaluation Depth 4}
+% %     \label{tab:naive_bayes_minimax_evaluation_depth_4}
+% % \end{table}
+
+% % It seems from these results that increasing the depth of the minimax algorithm didn't improve the performance of the engine. This further suggests that the issue is with the evaluation function that solely relies upon the classfier. Another observation from this is that the time taken for each move is about double compared to when the depth was 3, which is expected as the search tree is much larger. 
+
+% % A minimax algorithm with alpha beta pruning using traditional evaluation function was also implemented, to be used as a benchamark as well. The evaluation only considered the material balance and the positinal value of pieces. The same tests wiere conducted with a depth of 3. The results against the random engine are shown below:
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     Games Played        & 10           \\ \hline
+% %     Games Won           & 10           \\ \hline
+% %     Games Lost          & 0          \\ \hline
+% %     Games Drawn         & 0          \\ \hline
+% %     \end{tabular}
+% %     \caption{Traditional Minimax Evaluation Depth 4}
+% %     \label{tab:traditional_minimax_evaluation_depth_4}
+% % \end{table}
+
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.0666329374118727        
+% % % {'white': 16, 'black': 2}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.06544745432866084       
+% % % {'white': 13, 'black': 1}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.05950805346171061       
+% % % {'white': 16, 'black': 13}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.06503064204484989       
+% % % {'white': 14, 'black': 9}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.05323359274095105       
+% % % {'white': 14, 'black': 8}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.06438876020497289       
+% % % {'white': 15, 'black': 10}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.073584846548132
+% % % {'white': 16, 'black': 10}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.05293229103088379       
+% % % {'white': 16, 'black': 11}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.0306335234306228        
+% % % {'white': 13, 'black': 3}
+% % % Minimax vs Random
+% % % 1-0
+% % % Average time taken for each move: 0.04358914920261928       
+% % % {'white': 14, 'black': 7}
+% % % {'1-0': 10, '0-1': 0, '1/2-1/2': 0}
+
+% % What is interesting from these results is that the traditional algorithm was able to win all games, whereas the Naive Bayes algorithm was unable to win any games. Shown below is the algorithm against Stockfish at level 0.
+
+% % \begin{table}[H]
+% %     \centering
+% %     \begin{tabular}{|c|c|}
+% %     \hline
+% %     Games Played        & 10           \\ \hline
+% %     Games Won           & 1           \\ \hline
+% %     Games Lost          & 9          \\ \hline
+% %     Games Drawn         & 0           \\ \hline
+% %     \end{tabular}
+% %     \caption{Traditional Minimax Evaluation Against Stockfish}
+% %     \label{tab:traditional_minimax_evaluation_stockfish}
+% % \end{table}
+
+% % Here the algorithm is at least able to win 10\% of the time against Stockfish. However, when the depth of the algorithm is increased from 3 to 4, the algorithm is able to win 50\% of the time. This shows the importance of the depth used and, the significant impact it can have on the performance of an engine. However what is also important to note is the time taken to make a move increased 10 fold. 
+
+% % % Hello from the pygame community. https://www.pygame.org/contribute.html
+% % % Minimax vs Stockfish
+% % % 1-0
+% % % Average time taken for each move: 0.34663150665607856       
+% % % {'white': 12, 'black': 6}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.27326902250448865       
+% % % {'white': 6, 'black': 5}
+% % % Minimax vs Stockfish
+% % % 1-0
+% % % Average time taken for each move: 0.7042390436365984        
+% % % {'white': 10, 'black': 5}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.23526499227241235       
+% % % {'white': 5, 'black': 3}
+% % % Minimax vs Stockfish
+% % % 1-0
+% % % Average time taken for each move: 0.1439740037264889        
+% % % {'white': 11, 'black': 1}
+% % % Minimax vs Stockfish
+% % % 1-0
+% % % Average time taken for each move: 0.18150691266329783       
+% % % {'white': 12, 'black': 4}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.342784122987227
+% % % {'white': 5, 'black': 5}
+% % % Minimax vs Stockfish
+% % % 1-0
+% % % Average time taken for each move: 0.6357292710689076        
+% % % {'white': 12, 'black': 4}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.4371111918303926        
+% % % {'white': 6, 'black': 8}
+% % % Minimax vs Stockfish
+% % % 0-1
+% % % Average time taken for each move: 0.3347185233543659        
+% % % {'white': 10, 'black': 10}
+% % % {'1-0': 5, '0-1': 5, '1/2-1/2': 0}
+
+
+
+% % \section{Naive Bayes with Traditional Evaluation Function}
+
+% % Based on the results above, it is clear that the traditional evaluation function does much better than the one that uses the Naive Bayes classifier. However, it was shown that the Naive Bayes does understand some aspects that are important like material balance. Therefore, the next experiment wants to explore the idea of whether the Naive Bayes classfier can help support the traditional evaluation function. 
+
+% % TODO:FINISH
+
+% % \section{Influence of Feature Selection}
+
+% % The features used to train a model are crucial to the perfomance of the model. This is the only picture of the world that the model has. The better the features, the more realistic picture it has of the world. The features used previously when trained with 10,000 games seemed to only yield an F1 score of 0.6, which is not much better than random guessing. The next experiment investigates the impact of feature selection on the performace of the model.
+% % Therefore the same model was trained with the same number of games but with different features. 
+% % All the models were trained with 100,000 games and the features used for each model are shown below:
+
+% % \begin{itemize}
+% %     \item Model 0: Was restricted on only using material balance, positional value, mobility, king attack, as features
+% %     \item Model 1: Same as Model 0 but also considred the control of the centre. This was 2 seperate features, one for number of pieces in the 
+% %     2 by 2 square in the centre and the other for the 4 by 4 square in the centre.
+% %     \item Model 2: Same as Model 1 but also considered the structure of pawns. This was determined by the number of isolated pawns and doubles pawns. This equated to 4 more features, 2 for each colour.
+% %     \item Model 3: Same as Model 2 but included more complex features. One being the castling rights of each player as well as a way to determine the game phase, either beginning, middle or end game. Another feature this model considered was king safety and this was determined by the number of pawns around the king as well as number of attacks on sqaures adjacent to the king.
+% % \end{itemize}
+
+% % \begin{table}[h]
+% %     \centering
+% %     \caption{Model Performance Metrics}
+% %     \begin{tabular}{lccccc}
+% %         \toprule
+% %         Model  & F1 Score & Kappa Score & Accuracy & Recall & Precision \\
+% %         \midrule
+% %         Model 0 & 0.60398  & 0.22042  & 0.60914  & 0.49486  & 0.64928  \\
+% %         Model 1 & 0.60943  & 0.22190  & 0.61047  & 0.55795  & 0.62995  \\
+% %         Model 2 & 0.61158  & 0.22456  & 0.61198  & 0.57858  & 0.62618  \\
+% %         Model 3 & 0.61263  & 0.22513  & 0.61264  & 0.61920  & 0.61678  \\
+% %         \bottomrule
+% %     \end{tabular}
+% % \end{table}
+
+% % % $ python training.py
+% % % Class -1: 1113075
+% % % Class 1: 1137649
+% % % Confusion Matrix: 
+% % % [[201851  76108]
+% % %  [143824 140899]]
+% % % F1 Score:  0.6039803401379297
+% % % Kappa Score:  0.22041543437430355
+% % % Accuracy:  0.6091362439175235
+% % % Recall:  0.49486342866575583
+% % % Precision:  0.6492832028459912
+% % % Model0 saved.
+% % % Class -1: 1113075
+% % % Class 1: 1137649
+% % % Confusion Matrix: 
+% % % [[184639  93320]
+% % %  [125863 158860]]
+% % % F1 Score:  0.6094330510221935
+% % % Kappa Score:  0.2219042268569834
+% % % Accuracy:  0.6104673687802347
+% % % Recall:  0.5579457929285656
+% % % Precision:  0.6299468633515742
+% % % Model1 saved.
+% % % Class -1: 1113075
+% % % Class 1: 1137649
+% % % Confusion Matrix: 
+% % % [[179613  98346]
+% % %  [119987 164736]]
+% % % F1 Score:  0.6115831460689735
+% % % Kappa Score:  0.2245609499676403
+% % % Accuracy:  0.6119779911210951
+% % % Recall:  0.5785833950892622
+% % % Precision:  0.6261773895591488
+% % % Model2 saved.
+% % % Class -1: 1113075
+% % % Class 1: 1137649
+% % % Confusion Matrix: 
+% % % [[168420 109539]
+% % %  [108422 176301]]
+% % % F1 Score:  0.6126283382210077
+% % % Kappa Score:  0.22512926687487078
+% % % Accuracy:  0.6126391105455657
+% % % Recall:  0.6192018207169776
+% % % Precision:  0.6167821158690177
+% % % Model3 saved. 
+
+% % These results subtly show that the more features considered, the better the model generally performs, proven by the increase in F1 score from 0.603 for Model 0 to 0.613 for model 3. This supports the idea that the more information given to the model, the more it can understand about world. However the increase in model accuracy is very small that if an F1 score of 0.7 is aimed for, more than 150 features would be required. This is not feasible as during real time play, the engine would take too long to extract these features in order to make a move. The problems of misclassifying could be down to two factors, the first being the features used are not complex enough and not extracting enough nuances in the game that the model requires. However increase complexity of features would result in an engine that is much slower and not feasible to be used for real time game play. The second factor could be that the model is not complex enough to understand the intricacies of chess and therefore its unable to learn the patterns that grandmasters make to win games.
 
 
 
