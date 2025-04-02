@@ -57,6 +57,7 @@
 			\Large{Final Project Report}\\*
 			\vspace*{1.2in}
 			\large{Author: \@author\\*
+					Programme of Study: BSc (Hons) Computer Science\\*
 			           Supervisor: \@supervisor}\\*
 			           Student ID: \@studentID\\*
 			\vspace*{0.2in}
