@@ -1378,6 +1378,646 @@ def plot_feature_set_nodes_comparison(df):
     plt.show()
 
 
+def plot_win_draw_loss_by_dataset(df):
+    """
+    Create a stacked bar chart showing win/draw/loss percentages for each dataset.
+    """
+    # Ensure dataset column exists
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+        
+    # Map chess notation to readable outcomes
+    result_mapping = {"1-0": "Win", "0-1": "Loss", "1/2-1/2": "Draw"}
+    df['result_mapped'] = df['result'].map(result_mapping).fillna(df['result'])
+    
+    # Group by dataset and result, count occurrences
+    counts = df.groupby(['dataset', 'result_mapped']).size().unstack(fill_value=0)
+    
+    # Convert to percentages
+    counts_pct = counts.div(counts.sum(axis=1), axis=0) * 100
+
+    # Plot stacked bar chart
+    palette = sns.color_palette("Set1")
+    counts_pct.plot(kind='bar', stacked=True, figsize=(8,6), color=palette)
+    plt.title("Game Outcomes by Dataset (Percentage)")
+    plt.xlabel("Dataset")
+    plt.ylabel("Percentage of Games (%)")
+    plt.legend(title="Result", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+    plt.show()
+    
+    # Print actual values for reference
+    print("\nWin/Draw/Loss Rates by Dataset:")
+    print("=" * 50)
+    for dataset in counts_pct.index:
+        print(f"Dataset: {dataset}")
+        for result in counts_pct.columns:
+            print(f"  {result}: {counts_pct.loc[dataset, result]:.1f}%")
+        print(f"  (Total games: {counts.loc[dataset].sum()})")
+        print()
+
+def plot_win_draw_loss_by_dataset_pie(df):
+    """
+    Create pie charts showing win/draw/loss percentages for each dataset.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+        
+    # Map chess notation to readable outcomes
+    result_mapping = {"1-0": "Win", "0-1": "Loss", "1/2-1/2": "Draw"}
+    df['result_mapped'] = df['result'].map(result_mapping).fillna(df['result'])
+    
+    # Group by dataset and result, count occurrences
+    counts = df.groupby(['dataset', 'result_mapped']).size().unstack(fill_value=0)
+    
+    # Get unique datasets
+    datasets = counts.index.tolist()
+    n_datasets = len(datasets)
+    
+    # Create a figure with subplots (one pie chart per dataset)
+    fig, axes = plt.subplots(1, n_datasets, figsize=(5*n_datasets, 5))
+    
+    # Set color palette for consistency
+    palette = sns.color_palette("Set1")
+    
+    # If there's only one dataset, make axes iterable
+    if n_datasets == 1:
+        axes = [axes]
+    
+    # For each dataset, create a pie chart
+    for i, dataset in enumerate(datasets):
+        data = counts.loc[dataset]
+        axes[i].pie(data, labels=data.index, autopct='%1.1f%%', 
+                   startangle=90, colors=palette, shadow=False)
+        axes[i].set_title(f'Dataset: {dataset}')
+        axes[i].axis('equal')  # Equal aspect ratio ensures circular pie chart
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # Print actual values for reference
+    print("\nWin/Draw/Loss Rates by Dataset:")
+    print("=" * 50)
+    for dataset in counts.index:
+        total = counts.loc[dataset].sum()
+        print(f"Dataset: {dataset}")
+        for result in counts.columns:
+            percentage = (counts.loc[dataset, result] / total) * 100
+            print(f"  {result}: {percentage:.1f}% ({counts.loc[dataset, result]} games)")
+        print(f"  (Total games: {total})")
+        print()
+
+def plot_dataset_efficiency_metrics(df):
+    """
+    Create grouped bar charts comparing average move time and nodes 
+    explored across different datasets.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    
+    # Prepare data - average move time by dataset
+    time_data = df.groupby('dataset')['avg_move_times'].mean().reset_index()
+    
+    # Prepare data - average nodes explored by dataset
+    nodes_data = df.groupby('dataset')['avg_nodes_explored'].mean().reset_index()
+    
+    # Create two subplots side by side
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Plot average move time
+    sns.barplot(data=time_data, x='dataset', y='avg_move_times', ax=ax1, palette='Blues_d')
+    ax1.set_title('Average Move Time by Dataset')
+    ax1.set_xlabel('Dataset')
+    ax1.set_ylabel('Average Move Time (seconds)')
+    
+    # Plot average nodes explored
+    sns.barplot(data=nodes_data, x='dataset', y='avg_nodes_explored', ax=ax2, palette='Greens_d')
+    ax2.set_title('Average Nodes Explored by Dataset')
+    ax2.set_xlabel('Dataset')
+    ax2.set_ylabel('Average Nodes Explored')
+    
+    plt.tight_layout()
+    plt.show()
+
+def plot_blunder_analysis_by_dataset(df):
+    """
+    Create visualizations comparing blunder metrics across datasets:
+    1. Average number of negative blunders per game
+    2. Average blunder severity (negative values only)
+    """
+    if 'dataset' not in df.columns or 'blunders' not in df.columns:
+        print("Required columns not found in the dataset")
+        return
+    
+    # Count only negative blunders per game (actual blunders)
+    def count_negative_blunders(blunder_list):
+        if isinstance(blunder_list, list):
+            return sum(1 for x in blunder_list if x < 0)  # Only count negative values
+        return 0
+    
+    # Calculate average value of negative blunders
+    def avg_negative_blunders(blunder_list):
+        if isinstance(blunder_list, list):
+            negatives = [x for x in blunder_list if x < 0]  # Only use negative values
+            if negatives:
+                return np.mean(negatives)
+        return np.nan
+    
+    # Create new metrics
+    df['blunder_count'] = df['blunders'].apply(count_negative_blunders)
+    df['avg_blunder_value'] = df['blunders'].apply(avg_negative_blunders)
+    
+    # Group by dataset
+    count_data = df.groupby('dataset')['blunder_count'].mean().reset_index()
+    severity_data = df.groupby('dataset')['avg_blunder_value'].mean().reset_index()
+    
+    # Create two subplots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Plot average blunder count
+    sns.barplot(data=count_data, x='dataset', y='blunder_count', ax=ax1, palette='Reds_d')
+    ax1.set_title('Average Number of Blunders per Game')
+    ax1.set_xlabel('Dataset')
+    ax1.set_ylabel('Blunders per Game')
+    
+    # Plot average blunder severity
+    sns.barplot(data=severity_data, x='dataset', y='avg_blunder_value', ax=ax2, palette='Purples_d')
+    ax2.set_title('Average Blunder Severity')
+    ax2.set_xlabel('Dataset')
+    ax2.set_ylabel('Average Blunder Value')
+    
+    plt.tight_layout()
+    plt.show()
+
+def analyze_blunders_by_dataset(df):
+    """
+    Analyzes blunder metrics across different datasets:
+    1. Average number of negative blunders per game
+    2. Average value of negative blunders 
+    3. Lists of actual blunder values
+    """
+    print("\n" + "=" * 70)
+    print("BLUNDER ANALYSIS BY DATASET")
+    print("=" * 70)
+    
+    # Check if required columns exist
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    if 'blunders' not in df.columns:
+        print("No 'blunders' column found in the dataset")
+        return
+        
+    import ast
+    
+    # Filter for whole games if phase column exists to avoid double counting
+    if 'phase' in df.columns:
+        games_df = df[df['phase'] == 'whole']
+        if games_df.empty:
+            print("No games with phase 'whole' found, using all games.")
+            games_df = df
+    else:
+        games_df = df
+    
+    # Function to count negative blunders in a list (only negative values are real blunders)
+    def count_negative_blunders(blunder_str):
+        try:
+            if isinstance(blunder_str, str):
+                blunder_list = ast.literal_eval(blunder_str)
+            elif isinstance(blunder_str, list):
+                blunder_list = blunder_str
+            else:
+                return 0
+                
+            return sum(1 for b in blunder_list if b < 0)
+        except:
+            return 0
+    
+    # Function to extract negative blunder values for averaging
+    def extract_negative_blunders(blunder_str):
+        try:
+            if isinstance(blunder_str, str):
+                blunder_list = ast.literal_eval(blunder_str)
+            elif isinstance(blunder_str, list):
+                blunder_list = blunder_str
+            else:
+                return []
+                
+            return [b for b in blunder_list if b < 0]
+        except:
+            return []
+    
+    # Group by dataset
+    datasets = games_df['dataset'].unique()
+    
+    print("1. AVERAGE NUMBER OF NEGATIVE BLUNDERS PER GAME")
+    print("-" * 50)
+    for dataset in datasets:
+        dataset_data = games_df[games_df['dataset'] == dataset]
+        
+        # Calculate average negative blunders per game
+        blunder_counts = dataset_data['blunders'].apply(count_negative_blunders)
+        avg_blunder_count = blunder_counts.mean()
+        total_games = len(dataset_data)
+        
+        print(f"Dataset: {dataset} ({total_games} games): {avg_blunder_count:.2f} negative blunders per game")
+        
+        # Breakdown by opponent if applicable
+        if 'opponent' in games_df.columns:
+            opponents = games_df['opponent'].unique()
+            print("  By opponent:")
+            for opp in opponents:
+                filtered_data = dataset_data[dataset_data['opponent'] == opp]
+                
+                if not filtered_data.empty:
+                    opp_blunder_counts = filtered_data['blunders'].apply(count_negative_blunders)
+                    avg_opp_blunder_count = opp_blunder_counts.mean()
+                    opp_games = len(filtered_data)
+                    print(f"    vs {opp} ({opp_games} games): {avg_opp_blunder_count:.2f} negative blunders per game")
+        print()
+    
+    # Analyze average value of negative blunders
+    print("\n2. AVERAGE VALUE OF NEGATIVE BLUNDERS")
+    print("-" * 50)
+    all_dataset_blunders = {}
+    
+    for dataset in datasets:
+        dataset_data = games_df[games_df['dataset'] == dataset]
+        
+        # Collect all negative blunders for this dataset
+        all_blunders = []
+        for blunder_str in dataset_data['blunders']:
+            blunders = extract_negative_blunders(blunder_str)
+            all_blunders.extend(blunders)
+        
+        # Store all blunders for later display
+        all_dataset_blunders[dataset] = all_blunders
+        
+        # Calculate average value (if there are any blunders)
+        if all_blunders:
+            avg_blunder_value = sum(all_blunders) / len(all_blunders)
+            print(f"Dataset: {dataset}: {avg_blunder_value:.2f} ({len(all_blunders)} blunders)")
+        else:
+            print(f"Dataset: {dataset}: No blunders found")
+        
+        # Breakdown by opponent if applicable
+        if 'opponent' in games_df.columns:
+            opponents = games_df['opponent'].unique()
+            print("  By opponent:")
+            opponent_blunders = {}
+            
+            for opp in opponents:
+                filtered_data = dataset_data[dataset_data['opponent'] == opp]
+                
+                opp_blunders = []
+                for blunder_str in filtered_data['blunders']:
+                    blunders = extract_negative_blunders(blunder_str)
+                    opp_blunders.extend(blunders)
+                
+                opponent_blunders[opp] = opp_blunders
+                    
+                if opp_blunders:
+                    avg_opp_blunder_value = sum(opp_blunders) / len(opp_blunders)
+                    print(f"    vs {opp}: {avg_opp_blunder_value:.2f} ({len(opp_blunders)} blunders)")
+                else:
+                    print(f"    vs {opp}: No blunders found")
+        print()
+    
+    # Display actual blunder values
+    print("\n3. ACTUAL BLUNDER VALUES BY DATASET")
+    print("-" * 50)
+    
+    # Function to format a list of values in a readable way
+    def format_value_list(values, max_display=100):
+        if len(values) == 0:
+            return "No values found"
+            
+        # Limit the number of values displayed to avoid excessive output
+        if len(values) > max_display:
+            displayed = values[:max_display]
+            suffix = f" ... and {len(values) - max_display} more"
+        else:
+            displayed = values
+            suffix = ""
+        
+        # Format values with 2 decimal places
+        formatted = [f"{v:.2f}" for v in displayed]
+        
+        # Put values in rows of 8 for readability
+        rows = []
+        for i in range(0, len(formatted), 8):
+            rows.append(", ".join(formatted[i:i+8]))
+        
+        return "\n  ".join(rows) + suffix
+    
+    # Print actual blunder values by dataset
+    for dataset, blunders in all_dataset_blunders.items():
+        print(f"Dataset: {dataset} ({len(blunders)} total blunders)")
+        if blunders:
+            print(f"  {format_value_list(blunders)}")
+        else:
+            print("  No blunders found")
+        print()
+    
+    # Display opponent breakdown if needed
+    if 'opponent' in games_df.columns:
+        print("\n4. ACTUAL BLUNDER VALUES BY DATASET AND OPPONENT")
+        print("-" * 50)
+        
+        for dataset in datasets:
+            print(f"\nDATASET: {dataset}")
+            
+            if 'opponent' in games_df.columns:
+                opponents = games_df['opponent'].unique()
+                
+                for opp in opponents:
+                    # Get all blunders for this dataset and opponent
+                    filtered_data = games_df[(games_df['dataset'] == dataset) & (games_df['opponent'] == opp)]
+                    
+                    opp_blunders = []
+                    for blunder_str in filtered_data['blunders']:
+                        blunders = extract_negative_blunders(blunder_str)
+                        opp_blunders.extend(blunders)
+                    
+                    print(f"Opponent: {opp} ({len(opp_blunders)} blunders)")
+                    if opp_blunders:
+                        print(f"  {format_value_list(opp_blunders)}")
+                    else:
+                        print("  No blunders found")
+                    print()
+
+def plot_position_metrics_by_dataset(df):
+    """
+    Compare average mobility and piece balance across datasets with defined order.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    
+    # Define desired dataset order
+    dataset_order = ["beginner", "master", "random"]
+    
+    # Filter data to include only datasets in the order list
+    df_filtered = df[df['dataset'].isin(dataset_order)].copy()
+    
+    # Convert dataset to categorical with specified order
+    df_filtered['dataset'] = pd.Categorical(
+        df_filtered['dataset'], 
+        categories=dataset_order,
+        ordered=True
+    )
+    
+    # Calculate average mobility per game
+    df_filtered['mean_mobility'] = df_filtered['mobilities'].apply(safe_mean)
+    
+    # Create plot
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Sort data by the categorical order
+    mobility_data = df_filtered.groupby('dataset')['mean_mobility'].mean().reset_index()
+    balance_data = df_filtered.groupby('dataset')['avg_piece_balances'].mean().reset_index()
+    
+    # Plot average mobility
+    sns.barplot(data=mobility_data, x='dataset', y='mean_mobility', ax=ax1, palette='YlOrBr', order=dataset_order)
+    ax1.set_title('Average Mobility by Dataset')
+    ax1.set_xlabel('Dataset')
+    ax1.set_ylabel('Average Mobility')
+    
+    # Plot average piece balance
+    sns.barplot(data=balance_data, x='dataset', y='avg_piece_balances', ax=ax2, palette='PuBuGn', order=dataset_order)
+    ax2.set_title('Average Piece Balance by Dataset')
+    ax2.set_xlabel('Dataset')
+    ax2.set_ylabel('Average Piece Balance')
+    
+    plt.tight_layout()
+    plt.show()
+
+def plot_dataset_metrics_heatmap(df):
+    """
+    Create a heatmap showing multiple performance metrics across datasets.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    
+    # Calculate additional metrics if needed
+    df['mean_mobility'] = df['mobilities'].apply(safe_mean)
+    df['blunder_count'] = df['blunders'].apply(lambda x: sum(1 for b in x if isinstance(x, list) and b != 0))
+    
+    # Define metrics to include in heatmap
+    metrics = ['avg_move_times', 'avg_nodes_explored', 'avg_stockfish_evals', 
+               'mean_mobility', 'avg_piece_balances', 'blunder_count']
+    
+    # Create aggregated DataFrame with datasets as rows and metrics as columns
+    heatmap_data = df.groupby('dataset')[metrics].mean()
+    
+    # Normalize data for better visualization (each column scaled to 0-1)
+    normalized_data = (heatmap_data - heatmap_data.min()) / (heatmap_data.max() - heatmap_data.min())
+    
+    # Create heatmap
+    plt.figure(figsize=(10, 6))
+    sns.heatmap(normalized_data, annot=heatmap_data.round(2), cmap='viridis', 
+                linewidths=.5, fmt='.2f', cbar_kws={'label': 'Normalized Value'})
+    plt.title('Performance Metrics by Dataset (Normalized)')
+    plt.tight_layout()
+    plt.show()
+
+def plot_dataset_boxplots(df):
+    """
+    Create box plots showing the distribution of key metrics across datasets.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+
+    # Define dataset order
+    dataset_order = ["beginner", "master", "random"]
+    
+    # Create subplots for different metrics
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    
+    # Plot distributions of different metrics
+    sns.boxplot(x='dataset', y='avg_stockfish_evals', data=df, ax=axes[0, 0], 
+                palette='Set3', order=dataset_order)
+    axes[0, 0].set_title('Stockfish Evaluations by Dataset')
+    
+    # For mobilities, we need to unpack the list values
+    df_mobility = df.copy()
+    df_mobility['mean_mobility'] = df_mobility['mobilities'].apply(safe_mean)
+    sns.boxplot(x='dataset', y='mean_mobility', data=df_mobility, ax=axes[0, 1], 
+                palette='Set3', order=dataset_order)
+    axes[0, 1].set_title('Mobility by Dataset')
+    
+    # Blunders - average per game
+    df_blunders = df.copy()
+    df_blunders['blunder_count'] = df_blunders['blunders'].apply(
+        lambda x: sum(1 for b in x if isinstance(x, list) and b != 0))
+    sns.boxplot(x='dataset', y='blunder_count', data=df_blunders, ax=axes[1, 0], 
+                palette='Set3', order=dataset_order)
+    axes[1, 0].set_title('Blunders per Game by Dataset')
+    
+    # Move times
+    sns.boxplot(x='dataset', y='avg_move_times', data=df, ax=axes[1, 1], 
+                palette='Set3', order=dataset_order)
+    axes[1, 1].set_title('Move Times by Dataset')
+    
+    plt.tight_layout()
+    plt.show()
+
+def plot_dataset_bubble_chart(df):
+    """
+    Create a bubble chart showing three dimensions of data:
+    x-axis: avg_move_times
+    y-axis: avg_stockfish_evals
+    bubble size: avg_nodes_explored
+    color: dataset
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    
+    plt.figure(figsize=(10, 8))
+    
+    # Group by dataset and calculate mean metrics
+    grouped = df.groupby('dataset').agg({
+        'avg_move_times': 'mean',
+        'avg_stockfish_evals': 'mean',
+        'avg_nodes_explored': 'mean'
+    }).reset_index()
+    
+    # Create bubble chart
+    scatter = plt.scatter(
+        grouped['avg_move_times'],
+        grouped['avg_stockfish_evals'],
+        s=grouped['avg_nodes_explored']/10,  # Adjust bubble size for visibility
+        c=np.arange(len(grouped)),  # Different color for each dataset
+        alpha=0.7,
+        cmap='viridis'
+    )
+    
+    # Add dataset labels
+    for i, row in grouped.iterrows():
+        plt.annotate(
+            row['dataset'],
+            (row['avg_move_times'], row['avg_stockfish_evals']),
+            xytext=(7, 0),
+            textcoords='offset points',
+            fontsize=12
+        )
+    
+    # Add legend for bubble size
+    plt.legend(*scatter.legend_elements(prop="sizes", num=3, func=lambda x: x*10),
+              loc="upper right", title="Avg Nodes Explored")
+    
+    plt.xlabel('Average Move Time (seconds)')
+    plt.ylabel('Average Stockfish Evaluation')
+    plt.title('Dataset Performance - Bubble Chart')
+    plt.grid(True, linestyle='--', alpha=0.7)
+    
+    plt.tight_layout()
+    plt.show()
+
+def plot_dataset_parallel_coordinates(df):
+    """
+    Create a parallel coordinates plot to visualize relationships
+    between multiple metrics across datasets.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    
+    # Calculate additional metrics
+    df['mean_mobility'] = df['mobilities'].apply(safe_mean)
+    df['blunder_count'] = df['blunders'].apply(lambda x: sum(1 for b in x if isinstance(x, list) and b != 0))
+    
+    # Select metrics to include
+    metrics = ['avg_move_times', 'avg_nodes_explored', 'avg_stockfish_evals', 
+               'mean_mobility', 'avg_piece_balances', 'blunder_count']
+    
+    # Group by dataset and calculate means
+    plot_df = df.groupby('dataset')[metrics].mean().reset_index()
+    
+    # Normalize data for better visualization
+    plot_df_norm = plot_df.copy()
+    for col in metrics:
+        min_val = plot_df[col].min()
+        max_val = plot_df[col].max()
+        plot_df_norm[col] = (plot_df[col] - min_val) / (max_val - min_val)
+    
+    # Add dataset as color
+    plot_df_norm['color'] = plot_df_norm['dataset'].astype('category').cat.codes
+    
+    # Create parallel coordinates plot
+    plt.figure(figsize=(12, 6))
+    pd.plotting.parallel_coordinates(plot_df_norm, 'dataset', color=sns.color_palette("Set2", len(plot_df_norm)))
+    
+    plt.title('Dataset Performance Comparison - Parallel Coordinates')
+    plt.grid(False)
+    plt.legend(loc='upper right')
+    
+    plt.tight_layout()
+    plt.show()
+
+def plot_dataset_radar_chart(df):
+    """
+    Create a radar chart showing multiple metrics for each dataset.
+    """
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    
+    # Calculate needed metrics
+    df['mean_mobility'] = df['mobilities'].apply(safe_mean)
+    df['blunder_count'] = df['blunders'].apply(lambda x: sum(1 for b in x if isinstance(x, list) and b != 0))
+    
+    # Define metrics to include in radar chart
+    metrics = ['avg_move_times', 'avg_nodes_explored', 'avg_stockfish_evals', 
+               'mean_mobility', 'avg_piece_balances', 'blunder_count']
+    
+    # Group data by dataset
+    radar_data = df.groupby('dataset')[metrics].mean()
+    
+    # Normalize data for better comparison (0-1 scale for each metric)
+    normalized_data = (radar_data - radar_data.min()) / (radar_data.max() - radar_data.min())
+    
+    # Set up the radar chart
+    datasets = normalized_data.index.tolist()
+    num_vars = len(metrics)
+    
+    # Calculate angles for each metric
+    angles = np.linspace(0, 2*np.pi, num_vars, endpoint=False).tolist()
+    angles += angles[:1]  # Close the circle
+    
+    # Set up plot
+    fig, ax = plt.subplots(figsize=(10, 8), subplot_kw=dict(polar=True))
+    
+    # Plot each dataset
+    for i, dataset in enumerate(datasets):
+        values = normalized_data.loc[dataset].values.flatten().tolist()
+        values += values[:1]  # Close the polygon
+        
+        # Plot the dataset line
+        ax.plot(angles, values, linewidth=2, linestyle='solid', label=dataset)
+        # Fill area
+        ax.fill(angles, values, alpha=0.1)
+    
+    # Set labels
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels(metrics)
+    
+    # Add legend
+    plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+    plt.title('Dataset Performance Comparison - Radar Chart', size=15)
+    
+    plt.tight_layout()
+    plt.show()
+
+
+
+
 
 
 
@@ -1413,13 +2053,13 @@ def main():
 
     # plot_feature_set_comparison_bar_chart(compute_feature_set_metrics(df))   # happy
 
-    small_metrics = ["Avg Piece Balance"]
-    big_metrics = ["Avg Blunder Count", "Avg Mobility"]
-    metrics = compute_feature_set_metrics(df)
+    # small_metrics = ["Avg Piece Balance"]
+    # big_metrics = ["Avg Blunder Count", "Avg Mobility"]
+    # metrics = compute_feature_set_metrics(df)
 
-    plot_feature_set_comparison_bar_chart(metrics[small_metrics]) # happy
-    plot_feature_set_comparison_bar_chart(metrics[big_metrics]) # happy
-    # Choose eihere one graoh or two graphs
+    # plot_feature_set_comparison_bar_chart(metrics[small_metrics]) # happy
+    # plot_feature_set_comparison_bar_chart(metrics[big_metrics]) # happy
+    # # Choose eihere one graoh or two graphs
 
 
     # plot_win_draw_loss_by_implementation(df) #DONE
@@ -1438,8 +2078,21 @@ def main():
 
     # plot_win_draw_loss_by_feature_set(df)
 
-    plot_feature_set_time_comparison(df)
-    plot_feature_set_nodes_comparison(df)
+    # plot_feature_set_time_comparison(df)
+    # plot_feature_set_nodes_comparison(df)
+
+
+    # plot_win_draw_loss_by_dataset(df)
+    # plot_win_draw_loss_by_dataset_pie(df)
+    # plot_dataset_efficiency_metrics(df)
+    analyze_blunders_by_dataset(df)
+    # plot_position_metrics_by_dataset(df)
+    # plot_dataset_metrics_heatmap(df)
+    # plot_dataset_boxplots(df)
+    # plot_dataset_bubble_chart(df)
+    # plot_dataset_parallel_coordinates(df)
+    # plot_dataset_radar_chart(df)
+
 
 
 

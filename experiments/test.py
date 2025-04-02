@@ -446,13 +446,325 @@ def calculate_feature_set_metrics():
     # Return the DataFrame for further analysis if needed
     return feature_set_metrics
 
+def analyze_win_rates_by_dataset(df):
+    """
+    Analyzes win/draw/loss rates by dataset and by dataset+opponent.
+    Prints results in a clear tabular format.
+    """
+    # Function to calculate win/draw/loss percentages and counts
+    def calculate_win_rates(data):
+        # Simple calculation using chess notation
+        conditions = [
+            (data['result'] == '1-0'), 
+            (data['result'] == '1/2-1/2'), 
+            (data['result'] == '0-1')
+        ]
+        choices = ['win', 'draw', 'loss']
+        
+        data['outcome'] = np.select(conditions, choices, default='unknown')
+        
+        # Calculate counts
+        result_counts = data['outcome'].value_counts()
+        total = result_counts.sum()
+        
+        # Calculate percentages
+        percentages = (result_counts / total * 100).round(1)
+        
+        # Return both counts and percentages
+        return {
+            'counts': result_counts.to_dict(),
+            'percentages': percentages.to_dict(),
+            'total': total
+        }
+
+    # Check if dataset column exists
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+        
+    # 1. Overall comparison by dataset
+    datasets = df['dataset'].unique()
+    results_by_dataset = {}
+    for dataset in datasets:
+        dataset_data = df[df['dataset'] == dataset]
+        results_by_dataset[dataset] = calculate_win_rates(dataset_data)
+
+    # 2. Breakdown by dataset and opponent
+    opponents = df['opponent'].unique() if 'opponent' in df.columns else []
+    results_by_dataset_opponent = {}
+    for dataset in datasets:
+        results_by_dataset_opponent[dataset] = {}
+        for opp in opponents:
+            filtered_data = df[(df['dataset'] == dataset) & (df['opponent'] == opp)]
+            if not filtered_data.empty:
+                results_by_dataset_opponent[dataset][opp] = calculate_win_rates(filtered_data)
+
+    # Print overall results by dataset
+    print("=" * 70)
+    print("OVERALL WIN/DRAW/LOSS RATES BY DATASET")
+    print("=" * 70)
+    for dataset in datasets:
+        result = results_by_dataset[dataset]
+        counts = result['counts']
+        percentages = result['percentages']
+        total = result['total']
+        
+        win_count = counts.get('win', 0)
+        draw_count = counts.get('draw', 0)
+        loss_count = counts.get('loss', 0)
+        
+        win_pct = percentages.get('win', 0)
+        draw_pct = percentages.get('draw', 0)
+        loss_pct = percentages.get('loss', 0)
+        
+        print(f"Dataset: {dataset} (Total games: {total})")
+        print(f"  Win:  {win_count} games ({win_pct}%)")
+        print(f"  Draw: {draw_count} games ({draw_pct}%)")
+        print(f"  Loss: {loss_count} games ({loss_pct}%)")
+        print()
+
+    # Fix: Use len() to check if the array is non-empty
+    if len(opponents) > 0:  # This fixes the error
+        print("\n" + "=" * 70)
+        print("WIN/DRAW/LOSS RATES BY DATASET AND OPPONENT")
+        print("=" * 70)
+        for dataset in datasets:
+            print(f"\nDATASET: {dataset}")
+            print("-" * 50)
+            for opp in opponents:
+                if opp in results_by_dataset_opponent[dataset]:
+                    result = results_by_dataset_opponent[dataset][opp]
+                    counts = result['counts']
+                    percentages = result['percentages']
+                    total = result['total']
+                    
+                    win_count = counts.get('win', 0)
+                    draw_count = counts.get('draw', 0)
+                    loss_count = counts.get('loss', 0)
+                    
+                    win_pct = percentages.get('win', 0)
+                    draw_pct = percentages.get('draw', 0)
+                    loss_pct = percentages.get('loss', 0)
+                    
+                    print(f"Opponent: {opp} (Total games: {total})")
+                    print(f"  Win:  {win_count} games ({win_pct}%)")
+                    print(f"  Draw: {draw_count} games ({draw_pct}%)")
+                    print(f"  Loss: {loss_count} games ({loss_pct}%)")
+                    print()
+
+def analyze_blunders_by_dataset(df):
+    """
+    Analyzes blunder metrics across different datasets:
+    1. Average number of non-zero blunders per game
+    2. Average value of non-zero blunders
+    """
+    print("\n" + "=" * 70)
+    print("BLUNDER ANALYSIS BY DATASET")
+    print("=" * 70)
+    
+    # Check if required columns exist
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    if 'blunders' not in df.columns:
+        print("No 'blunders' column found in the dataset")
+        return
+        
+    import ast
+    
+    # Filter for whole games if phase column exists to avoid double counting
+    if 'phase' in df.columns:
+        games_df = df[df['phase'] == 'whole']
+        if games_df.empty:
+            print("No games with phase 'whole' found, using all games.")
+            games_df = df
+    else:
+        games_df = df
+    
+    # Function to count non-zero blunders in a list
+    def count_nonzero_blunders(blunder_str):
+        try:
+            if isinstance(blunder_str, str):
+                blunder_list = ast.literal_eval(blunder_str)
+            elif isinstance(blunder_str, list):
+                blunder_list = blunder_str
+            else:
+                return 0
+                
+            return sum(1 for b in blunder_list if b != 0)
+        except:
+            return 0
+    
+    # Function to extract non-zero blunder values for averaging
+    def extract_nonzero_blunders(blunder_str):
+        try:
+            if isinstance(blunder_str, str):
+                blunder_list = ast.literal_eval(blunder_str)
+            elif isinstance(blunder_str, list):
+                blunder_list = blunder_str
+            else:
+                return []
+                
+            return [b for b in blunder_list if b != 0]
+        except:
+            return []
+    
+    # Group by dataset
+    datasets = games_df['dataset'].unique()
+    
+    print("1. AVERAGE NUMBER OF NON-ZERO BLUNDERS PER GAME")
+    print("-" * 50)
+    for dataset in datasets:
+        dataset_data = games_df[games_df['dataset'] == dataset]
+        
+        # Calculate average non-zero blunders per game
+        blunder_counts = dataset_data['blunders'].apply(count_nonzero_blunders)
+        avg_blunder_count = blunder_counts.mean()
+        total_games = len(dataset_data)
+        
+        print(f"Dataset: {dataset} ({total_games} games): {avg_blunder_count:.2f} non-zero blunders per game")
+        
+        # Breakdown by opponent if applicable
+        if 'opponent' in games_df.columns:
+            opponents = games_df['opponent'].unique()
+            print("\n  By opponent:")
+            for opp in opponents:
+                filtered_data = dataset_data[dataset_data['opponent'] == opp]
+                
+                if not filtered_data.empty:
+                    opp_blunder_counts = filtered_data['blunders'].apply(count_nonzero_blunders)
+                    avg_opp_blunder_count = opp_blunder_counts.mean()
+                    opp_games = len(filtered_data)
+                    print(f"    vs {opp} ({opp_games} games): {avg_opp_blunder_count:.2f} non-zero blunders per game")
+        print()
+    
+    # Analyze average value of non-zero blunders
+    print("\n2. AVERAGE VALUE OF NON-ZERO BLUNDERS")
+    print("-" * 50)
+    for dataset in datasets:
+        dataset_data = games_df[games_df['dataset'] == dataset]
+        
+        # Collect all non-zero blunders for this dataset
+        all_blunders = []
+        for blunder_str in dataset_data['blunders']:
+            blunders = extract_nonzero_blunders(blunder_str)
+            all_blunders.extend(blunders)
+        
+        # Calculate average value (if there are any blunders)
+        if all_blunders:
+            avg_blunder_value = sum(all_blunders) / len(all_blunders)
+            print(f"Dataset: {dataset}: {avg_blunder_value:.2f} ({len(all_blunders)} blunders)")
+        else:
+            print(f"Dataset: {dataset}: No blunders found")
+        
+        # Breakdown by opponent if applicable
+        if 'opponent' in games_df.columns:
+            opponents = games_df['opponent'].unique()
+            print("\n  By opponent:")
+            for opp in opponents:
+                filtered_data = dataset_data[dataset_data['opponent'] == opp]
+                
+                opp_blunders = []
+                for blunder_str in filtered_data['blunders']:
+                    blunders = extract_nonzero_blunders(blunder_str)
+                    opp_blunders.extend(blunders)
+                    
+                if opp_blunders:
+                    avg_opp_blunder_value = sum(opp_blunders) / len(opp_blunders)
+                    print(f"    vs {opp}: {avg_opp_blunder_value:.2f} ({len(opp_blunders)} blunders)")
+                else:
+                    print(f"    vs {opp}: No blunders found")
+        print()
+
+def analyze_piece_balance_by_dataset(df):
+    """
+    Analyzes the average piece balance across different datasets.
+    Breaks down results by dataset and optionally by opponent.
+    """
+    print("\n" + "=" * 70)
+    print("AVERAGE PIECE BALANCE BY DATASET")
+    print("=" * 70)
+    
+    # Check if required columns exist
+    if 'dataset' not in df.columns:
+        print("No 'dataset' column found in the dataset")
+        return
+    if 'piece_balances' not in df.columns:
+        print("No 'piece_balances' column found in the dataset")
+        return
+    
+    # Parse and calculate piece balance average per game
+    def calculate_avg_piece_balance(piece_balance_str):
+        try:
+            if isinstance(piece_balance_str, str):
+                piece_balance_list = ast.literal_eval(piece_balance_str)
+                if piece_balance_list and len(piece_balance_list) > 0:
+                    return sum(piece_balance_list) / len(piece_balance_list)
+            elif isinstance(piece_balance_str, list) and len(piece_balance_str) > 0:
+                return sum(piece_balance_str) / len(piece_balance_str)
+        except:
+            pass
+        return np.nan
+    
+    # Filter for whole games if phase column exists
+    if 'phase' in df.columns:
+        games_df = df[df['phase'] == 'whole'].copy()
+        if games_df.empty:
+            print("No games with phase 'whole' found, using all games.")
+            games_df = df.copy()
+    else:
+        games_df = df.copy()
+    
+    # Calculate average piece balance for each game
+    games_df['avg_piece_balance'] = games_df['piece_balances'].apply(calculate_avg_piece_balance)
+    
+    # Group by dataset
+    datasets = games_df['dataset'].unique()
+    
+    for dataset in datasets:
+        dataset_data = games_df[games_df['dataset'] == dataset]
+        avg_balance = dataset_data['avg_piece_balance'].mean()
+        total_games = len(dataset_data)
+        
+        print(f"Dataset: {dataset} ({total_games} games): {avg_balance:.3f} average piece balance")
+        
+        # Breakdown by opponent if applicable
+        if 'opponent' in games_df.columns:
+            opponents = games_df['opponent'].unique()
+            print("\n  By opponent:")
+            for opp in opponents:
+                filtered_data = dataset_data[dataset_data['opponent'] == opp]
+                
+                if not filtered_data.empty:
+                    opp_avg_balance = filtered_data['avg_piece_balance'].mean()
+                    opp_games = len(filtered_data)
+                    print(f"    vs {opp} ({opp_games} games): {opp_avg_balance:.3f} average piece balance")
+        print()
+    
+    # Return average piece balance by dataset as a dictionary for further analysis
+    return games_df.groupby('dataset')['avg_piece_balance'].mean().to_dict()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # df = load_data()
 # calculate_average_by_phase_and_implementation(df)
 
-calculate_feature_set_metrics()
-
-
+analyze_piece_balance_by_dataset(df)
 
 
 

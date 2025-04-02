@@ -1,4 +1,4 @@
-\chapter{Results}
+\chapter{Results \& Discussion}
 
 
 \section{Naive Bayes Evaluation}
@@ -397,10 +397,169 @@ The general trend shown in figure \ref{fig: feature_set_vs_avg_nodes_explored} i
 
 What can be concluded from these results is that increasing the complexity of the features does  guarantee better outcomes. Despite fewer nodes being explored, the cost of evaluation increases the total move time significantly. In real-time chess engines, it is important to find a balance between a strong evaluation function and the efficiency of the evaluation. It also indicates the the additional overhead of utilising more features can be counterproductive.
 
+\section{Dataset Analysis}
+
+Another factor that may affect the performance of the engine is the dataset used to train the model. As mentioned before there were 3 datasets used to train the model. Master games, where one of the players had an Elo higher than 2200, beginner games, where both players had an Elo lower than 2200 and random games that took a random sample from the the whole dataset. Since there were only 300,000 master games in the dataset used, 300,000 games were also used for the beginner and random datasets. This was to ensure that the datasets were of similar size preventing any bias. Figure \ref{fig: dataset_vs_win_rate_pie} shows the outcomes of the games for each dataset.
 
 
 
+% ======================================================================
+% OVERALL WIN/DRAW/LOSS RATES BY DATASET    
+% ======================================================================
+% Dataset: master (Total games: 4318)       
+%   Win:  2042 games (47.3%)
+%   Draw: 180 games (4.2%)
+%   Loss: 2096 games (48.5%)
 
+% Dataset: random (Total games: 4318)       
+%   Win:  2002 games (46.4%)
+%   Draw: 212 games (4.9%)
+%   Loss: 2104 games (48.7%)
+
+% Dataset: beginner (Total games: 3838)     
+%   Win:  1818 games (47.4%)
+%   Draw: 152 games (4.0%)
+%   Loss: 1868 games (48.7%)
+
+
+% ======================================================================
+% WIN/DRAW/LOSS RATES BY DATASET AND OPPONENT
+% ======================================================================
+
+% DATASET: master
+% --------------------------------------------------
+% Opponent: random (Total games: 2158)      
+%   Win:  2014 games (93.3%)
+%   Draw: 144 games (6.7%)
+%   Loss: 0 games (0%)
+
+% Opponent: stockfish (Total games: 2160)   
+%   Win:  28 games (1.3%)
+%   Draw: 36 games (1.7%)
+%   Loss: 2096 games (97.0%)
+
+
+% DATASET: random
+% --------------------------------------------------
+% Opponent: random (Total games: 2158)      
+%   Win:  1966 games (91.1%)
+%   Draw: 192 games (8.9%)
+%   Loss: 0 games (0%)
+
+% Opponent: stockfish (Total games: 2160)   
+%   Win:  36 games (1.7%)
+%   Draw: 20 games (0.9%)
+%   Loss: 2104 games (97.4%)
+
+
+% DATASET: beginner
+% --------------------------------------------------
+% Opponent: random (Total games: 1918)      
+%   Win:  1794 games (93.5%)
+%   Draw: 124 games (6.5%)
+%   Loss: 0 games (0%)
+
+% Opponent: stockfish (Total games: 1920)   
+%   Win:  24 games (1.2%)
+%   Draw: 28 games (1.5%)
+%   Loss: 1868 games (97.3%)
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/plots/dataset/Dataset_vs_win_rate_pie.png}
+    \caption{Win Rate of each Dataset}
+    \label{fig: dataset_vs_win_rate_pie}
+\end{figure}
+
+The pie charts very minimal difference in performance across the three datasets. They all had win rates between 47\% and 48\%, loss rates between 48\% and 49\% and draw rates between 3\% and 4\%. This also indicates that the features used in the model have roughly equal power to identify winning and losing positions, regardless whether these positions came from a more experienced player or a less experienced player. This could be because the features used are very broad and are generally unaffected by the experience of the player, whereas other features may be more affected by the experience of the player. The most notable difference is the draw rate, where the random dataset had a draw rate of 4.9\% compared to 4.2\% for master and 4.0\% for beginner. This slight increase in the number of draws could be from mismatched skill levels or that the opponents used are not considered either master or beginner players. Due to the purpose of this project, the classifier only classified games into win or losses and did not utilise games that resulted in draws. This could explain the higher draw rate in the random dataset, since it was trained on a more diverse set of games. All three datasets won over 90\% of the games against random opponents, and losing no games against them. This domination by the engine confirms the ability of the engine to win from a position of strength. Against stockfish, all three datasets perform poorly obtaining an average loss rate of 97\% . What is interesting is that the the win rate of the random dataset against stockfish was slightly better than the other datasets, obtaining a win rate of 1.7\% compared to 1.3\% for master and 1.2\% for beginner. This could suggest the random dataset was able to generalise better to different positions and situations, due to the diverse games it used.
+
+% ======================================================================
+% BLUNDER ANALYSIS BY DATASET
+% ======================================================================
+% 1. AVERAGE NUMBER OF BLUNDERS PER GAME 
+% --------------------------------------------------
+% Dataset: master (1080 games): 7.92  blunders per game 
+
+%   By opponent:
+%     vs random (540 games): 12.49 blunders per game 
+%     vs stockfish (540 games): 3.34 blunders per game 
+
+% Dataset: random (1080 games): 8.21 blunders per game 
+
+%   By opponent:
+%     vs random (540 games): 12.89 blunders per game 
+%     vs stockfish (540 games): 3.54 blunders per game 
+
+% Dataset: beginner (960 games): 6.88 blunders per game 
+
+%   By opponent:
+%     vs random (480 games): 10.18 blunders per game 
+%     vs stockfish (480 games): 3.58 blunders per game 
+
+
+% 2. AVERAGE VALUE OF BLUNDERS      
+% --------------------------------------------------
+% Dataset: master: -3078.76 (8553 blunders)
+
+%   By opponent:
+%     vs random: -2624.54 (6747 blunders)
+%     vs stockfish: -4775.67 (1806 blunders)
+
+% Dataset: random: -3118.01 (8868 blunders)
+
+%   By opponent:
+%     vs random: -2661.88 (6959 blunders)
+%     vs stockfish: -4780.77 (1909 blunders)
+
+% Dataset: beginner: -3590.62 (6606 blunders)
+
+%   By opponent:
+%     vs random: -3197.91 (4888 blunders)
+%     vs stockfish: -4707.93 (1718 blunders)
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/plots/dataset/Dataset_vs_blunder_value_and_count.png}
+    \caption{Average Blunder Value and Count of each Dataset}
+    \label{fig: dataset_vs_blunder_value_and_count}
+\end{figure}
+
+
+Figure \ref{fig: dataset_vs_blunder_value_and_count} shows the number of blunders per game across each dataset and the average blunder value. Beginner has the lowest blunder count per game at around 3.34 blunders per game, while master and random have similar blunder counts of 3.54 and 3.58 respectively. Master level games generally include complex strategies and tactics which could have been misunderstood by the Naive Bayes classifier causing it to make more mistakes. Random data can also present more unpredicted situations, finding it difficult to differentiate whether it was a good move by a experienced player or a bad move from a less experienced player. However, the chart also shows that despite have a lower blunder count, the beginner dataset caused much worse blunders on average, with an average blunder value of -3590.62 compared to -3078.76 for master and -3118.01 for random. In beginner games, mistakes might directly lead to a large loss in material whereas master games may see more frequent blunders but less severe ones. This data indicates the importance of the training data in the performance of the engine and that there is a fine balance between the number of blunders and the severity of the blunders.
+
+
+% ======================================================================
+% AVERAGE PIECE BALANCE BY DATASET
+% ======================================================================
+% Dataset: master (1080 games): 0.419 average piece balance       
+
+%   By opponent:
+%     vs random (540 games): 1.670 average piece balance
+%     vs stockfish (540 games): -0.831 average piece balance      
+
+% Dataset: random (1080 games): 0.351 average piece balance       
+
+%   By opponent:
+%     vs random (540 games): 1.578 average piece balance
+%     vs stockfish (540 games): -0.877 average piece balance      
+
+% Dataset: beginner (960 games): 0.492 average piece balance      
+
+%   By opponent:
+%     vs random (480 games): 1.764 average piece balance
+%     vs stockfish (480 games): -0.780 average piece balance 
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/plots/dataset/Dataset_vs_mobility_and_piece_balance.png}
+    \caption{Average Mobility and Piece Balance of each Dataset}
+    \label{fig: dataset_vs_mobility_and_piece_balance}
+\end{figure}
+
+Figure \ref{fig: dataset_vs_mobility_and_piece_balance} shows the average mobility and piece balance of each dataset. The mobility over all three dataset seems to be very similar showing a consistent understanding of the importance of mobility. However there was a big difference between the 3 datasets when it came to piece balance. The beginner dataset achieved the highest average piece balance of 0.492, while master and random achieved 0.419 and 0.351 respectively. This indicates that the beginner games the model was trained on, it learnt the importance of material advantage, which is a very basic principle most chess players acknowledge despite their level. The master dataset was also positive in its piece balance however was lower than the beginner dataset. This could be due to the complexity of the games and the strategies used by the players, which may have confused the model, especially not being able to understand long-term sacrifices that are common in master level games. The engine trained on the random elo data, achieved the lowest piece balance of 0.351. This could be due to the games it was trained on, it was not able to distinguish between strong and weak moves and patterns, causing it to make more unfavourable trades. 
 
 
 
