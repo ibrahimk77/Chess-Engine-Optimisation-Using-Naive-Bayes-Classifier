@@ -48,9 +48,6 @@ def evaluate(board):
         chess.QUEEN: 900,
         chess.KING: 0
     }
-    #TODO: QUOTE THIS
-    #https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=00307ba02e3fa2e23eac5e3c35dabeb054054fe3
-
 
     PAWN_POSITION_TABLE = [
         [0, 0, 0, 0, 0, 0, 0, 0],

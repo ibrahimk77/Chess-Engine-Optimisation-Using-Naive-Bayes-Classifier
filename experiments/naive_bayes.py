@@ -8,7 +8,7 @@ class NaiveBayes:
         self.stds = {}
         self.means = {}
         self.classes = None
-        self.epsilon = 0.1 #TODO: CHANGE
+        self.epsilon = 0.1
     
     def fit(self, X, y):
         self.classes = np.unique(y)
@@ -35,7 +35,7 @@ class NaiveBayes:
 
             for c in self.classes:
 
-                posterior = np.log(self.priors[c]) #TODO: Mention log in report 
+                posterior = np.log(self.priors[c]) 
 
                 for i, feature_val in enumerate(x):
                     likelihood = self.calculate_likelihood(
@@ -44,12 +44,12 @@ class NaiveBayes:
                         self.stds[c][i]
                     )
 
-                    posterior += np.log(likelihood + self.epsilon) #TODO: Mention add small constant to prevent log(0) in report
+                    posterior += np.log(likelihood + self.epsilon)
 
                 posteriors[c] = posterior
 
 
-            predictions.append(max(posteriors.items(), key=lambda x: x[1])[0]) # selects highest posterior
+            predictions.append(max(posteriors.items(), key=lambda x: x[1])[0])
         
         return np.array(predictions)
 
@@ -61,8 +61,7 @@ class NaiveBayes:
 
             for c in self.classes:
 
-                posterior = np.log(self.priors[c]) #TODO: Mention log in report 
-
+                posterior = np.log(self.priors[c]) 
                 for i, feature_val in enumerate(x):
                     likelihood = self.calculate_likelihood(
                         feature_val, 
@@ -70,8 +69,7 @@ class NaiveBayes:
                         self.stds[c][i]
                     )
 
-                    posterior += np.log(likelihood + self.epsilon) #TODO: Mention add small constant to prevent log(0) in report
-
+                    posterior += np.log(likelihood + self.epsilon)
                 posteriors[c] = posterior
 
             predictions.append(posteriors)

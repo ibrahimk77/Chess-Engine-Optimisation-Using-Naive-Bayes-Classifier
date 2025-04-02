@@ -46,7 +46,7 @@ def features_from_AN(an, result, model_num):
         if i == total_moves - 1:
             extract = True
     
-        if extract: # or i == len(moves) - 1:
+        if extract: 
             
             features = board_features(board, model_num)
             features['result'] = result
@@ -71,16 +71,4 @@ def preprocess_data(df, output_file, i):
     new_df = pd.DataFrame(all_features)
     #new_df.to_csv(f"{output_file}_features_{i}.csv", index=False)
     return new_df
-
-
-
-
-def preprocess_data_4():
-    for i in range(4):
-        preprocess_data(f'chess_games_100k.csv', f'chess_games_features_{i}.csv', i)
-        
-#preprocess_data('chess_games_10k.csv', 'chess_games_features.csv', 1)
-#preprocess_data_4()
-
-
 

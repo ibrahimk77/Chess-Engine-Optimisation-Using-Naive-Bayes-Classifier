@@ -6,11 +6,9 @@ import pandas as pd
 import os
 
 FILE = 'chess_results.csv'
-# FILE = "test.csv"
-print("TEST")
 
 datasets = ['master', 'beginner', 'random']
-features = [1, 2]
+features = [0, 1, 2, 3]
 weightings = [0]
 opponents = ['random', 'stockfish']
 num_games = 30
@@ -51,7 +49,6 @@ for dataset in datasets:
                         continue
 
                 df = pd.DataFrame(all_results)
-                # If file exists, load it, append new data, then save
                 if os.path.exists(FILE):
                     existing_df = pd.read_csv(FILE)
                     combined_df = pd.concat([existing_df, df], ignore_index=True)
@@ -73,7 +70,7 @@ print(f"Total time: {((t - initial_time)/60/60)} hours")
 
 
 datasets = ['master', 'beginner', 'random']
-features = [1, 2]
+features = [0, 1, 2, 3]
 weightings = [0.25, 0.5, 0.75]
 opponents = ['random', 'stockfish']
 num_games = 30
@@ -95,7 +92,6 @@ for dataset in datasets:
                         start = time.time()
                         game_stats = play(model, scaler, o, i, implementation, feature, nb_weight)
                         
-                        #save result 
                         end = time.time()
                         print(f"Game {i} took {(end - start)} seconds")
 
@@ -114,7 +110,6 @@ for dataset in datasets:
                         continue
 
                 df = pd.DataFrame(all_results)
-                # If file exists, load it, append new data, then save
                 if os.path.exists(FILE):
                     existing_df = pd.read_csv(FILE)
                     combined_df = pd.concat([existing_df, df], ignore_index=True)

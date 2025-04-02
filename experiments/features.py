@@ -147,7 +147,6 @@ def pawn_structure(board, color):
         file_counts[chess.square_file(sq)] += 1
     doubled = sum(count - 1 for count in file_counts if count > 1)
     
-    # Count isolated pawns: if a file has pawns and neither adjacent file has any.
     isolated = 0
     for file in range(8):
         if file_counts[file] > 0:
@@ -168,7 +167,7 @@ def castling_rights(board):
 def king_safety(board, color):
     king_sq = board.king(color)
     if king_sq is None:
-        return 0  # Undefined if the king is missing
+        return 0
     king_file = chess.square_file(king_sq)
     king_rank = chess.square_rank(king_sq)
     adjacent_squares = [
@@ -216,25 +215,21 @@ def add_passed_pawn_features(board, features):
     return features
 
 def game_phase(board):
-    # Define phase values for each piece type.
     phase_values = {
         chess.QUEEN: 4,
         chess.ROOK: 2,
         chess.BISHOP: 1,
         chess.KNIGHT: 1,
-        chess.PAWN: 0,   # Pawns are less significant for phase determination
-        chess.KING: 0    # Kings are not counted in phase value
+        chess.PAWN: 0,   
+        chess.KING: 0
     }
     
-    # Calculate the total phase value for the starting position.
-    # For one side: 1 Queen, 2 Rooks, 2 Bishops, 2 Knights.
     total_phase_one_side = (phase_values[chess.QUEEN] +
                               2 * phase_values[chess.ROOK] +
                               2 * phase_values[chess.BISHOP] +
                               2 * phase_values[chess.KNIGHT])
-    total_phase = 2 * total_phase_one_side  # both sides
+    total_phase = 2 * total_phase_one_side 
     
-    # Compute the current phase value based on the pieces still on the board.
     current_phase = 0
     for piece_type, weight in phase_values.items():
         current_phase += weight * (
@@ -242,10 +237,8 @@ def game_phase(board):
             len(board.pieces(piece_type, chess.BLACK))
         )
     
-    # Normalize the phase value: 1 indicates full material (opening), 0 indicates endgame.
     normalized_phase = current_phase / total_phase
     
-    # Determine the game phase based on thresholds.
     if normalized_phase > 0.66:
         return 0  # Opening
     elif normalized_phase > 0.33:
@@ -259,8 +252,6 @@ def add_game_phase_feature(board, features):
     return features
 
 
-# Simple cache for board features keyed by FEN string.
-_features_cache = {}
 
 # def board_features(board, model=4):
 

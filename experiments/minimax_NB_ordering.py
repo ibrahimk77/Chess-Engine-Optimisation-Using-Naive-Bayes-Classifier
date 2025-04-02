@@ -72,8 +72,6 @@ def evaluate(board):
         chess.QUEEN: 900,
         chess.KING: 0
     }
-    #TODO: QUOTE THIS
-    #https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=00307ba02e3fa2e23eac5e3c35dabeb054054fe3
 
 
     PAWN_POSITION_TABLE = [
@@ -172,7 +170,7 @@ def evaluate(board):
                     evaluation += KING_POSITION_TABLE[rank][file]
             else:
                 if piece_type == chess.PAWN:
-                    evaluation -= PAWN_POSITION_TABLE[7 - rank][file]  # Reverse rank for black
+                    evaluation -= PAWN_POSITION_TABLE[7 - rank][file] 
                 elif piece_type == chess.KNIGHT:
                     evaluation -= KNIGHT_POSITION_TABLE[7 - rank][file]
                 elif piece_type == chess.BISHOP:
