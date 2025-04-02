@@ -342,11 +342,115 @@ def calculate_average_node_And_time_by_phase_and_implementation(df):
     print(avg_nodes_evaluated)
 
 
+def calculate_feature_set_metrics():
+    """
+    Calculate and print average piece balance, non-zero blunder count,
+    and mobility for each feature set.
+    """
+    print("\n" + "=" * 70)
+    print("METRICS BY FEATURE SET")
+    print("=" * 70)
+    
+    # Ensure we have a feature_selection column
+    if 'feature_selection' not in df.columns:
+        print("No 'feature_selection' column found in the dataset")
+        return
+        
+    # Convert feature_selection to string for consistent grouping
+    df['feature_selection'] = df['feature_selection'].astype(str)
+    
+    # Filter for whole games if phase column exists
+    if 'phase' in df.columns:
+        analysis_df = df[df['phase'] == 'whole'].copy()
+        if analysis_df.empty:
+            print("No games with phase 'whole' found, using all games.")
+            analysis_df = df.copy()
+    else:
+        analysis_df = df.copy()
+    
+    # Parse and calculate piece balance average per game
+    def calculate_avg_piece_balance(piece_balance_str):
+        try:
+            if isinstance(piece_balance_str, str):
+                piece_balance_list = ast.literal_eval(piece_balance_str)
+                if piece_balance_list and len(piece_balance_list) > 0:
+                    return sum(piece_balance_list) / len(piece_balance_list)
+            elif isinstance(piece_balance_str, list) and len(piece_balance_str) > 0:
+                return sum(piece_balance_str) / len(piece_balance_str)
+        except:
+            pass
+        return np.nan
+    
+    # Parse and calculate mobility average per game
+    def calculate_avg_mobility(mobility_str):
+        try:
+            if isinstance(mobility_str, str):
+                mobility_list = ast.literal_eval(mobility_str)
+                if mobility_list and len(mobility_list) > 0:
+                    return sum(mobility_list) / len(mobility_list)
+            elif isinstance(mobility_str, list) and len(mobility_str) > 0:
+                return sum(mobility_str) / len(mobility_str)
+        except:
+            pass
+        return np.nan
+    
+    # Count non-zero blunders per game
+    def count_nonzero_blunders(blunder_str):
+        try:
+            if isinstance(blunder_str, str):
+                blunder_list = ast.literal_eval(blunder_str)
+                return sum(1 for b in blunder_list if b != 0)
+            elif isinstance(blunder_str, list):
+                return sum(1 for b in blunder_str if b != 0)
+        except:
+            pass
+        return 0
+    
+    # Calculate metrics for each game
+    analysis_df['avg_piece_balance'] = analysis_df['piece_balances'].apply(calculate_avg_piece_balance)
+    analysis_df['avg_mobility'] = analysis_df['mobilities'].apply(calculate_avg_mobility)
+    analysis_df['nonzero_blunder_count'] = analysis_df['blunders'].apply(count_nonzero_blunders)
+    
+    # Group by feature set and calculate average metrics
+    feature_set_metrics = (analysis_df
+                           .groupby('feature_selection')
+                           .agg({
+                               'avg_piece_balance': 'mean',
+                               'avg_mobility': 'mean',
+                               'nonzero_blunder_count': 'mean'
+                           })
+                           .reset_index())
+    
+    # Sort by feature set (numerical order if possible)
+    try:
+        feature_set_metrics['feature_set_num'] = pd.to_numeric(feature_set_metrics['feature_selection'])
+        feature_set_metrics = feature_set_metrics.sort_values('feature_set_num')
+        feature_set_metrics = feature_set_metrics.drop('feature_set_num', axis=1)
+    except:
+        # If conversion fails, just sort alphabetically
+        feature_set_metrics = feature_set_metrics.sort_values('feature_selection')
+    
+    # Print results in a nice format
+    for _, row in feature_set_metrics.iterrows():
+        feature_set = row['feature_selection']
+        piece_balance = row['avg_piece_balance']
+        mobility = row['avg_mobility']
+        blunder_count = row['nonzero_blunder_count']
+        
+        print(f"Feature Set {feature_set}:")
+        print(f"  Average Piece Balance: {piece_balance:.3f}")
+        print(f"  Average Mobility: {mobility:.3f}")
+        print(f"  Average Non-zero Blunders per Game: {blunder_count:.3f}")
+        print()
+    
+    # Return the DataFrame for further analysis if needed
+    return feature_set_metrics
+
+
 # df = load_data()
 # calculate_average_by_phase_and_implementation(df)
 
-calculate_average_node_And_time_by_phase_and_implementation(df)
-
+calculate_feature_set_metrics()
 
 
 

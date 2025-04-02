@@ -909,7 +909,7 @@ def compute_feature_set_metrics(df):
         'win': 'Win Rate',
         'avg_piece_balances': 'Avg Piece Balance',
         'avg_move_times': 'Avg Move Time',
-        'nonzero_blunder_count': 'Avg Blunder Value',
+        'nonzero_blunder_count': 'Avg Blunder Count',
         'mean_mobility': 'Avg Mobility'
     })
     
@@ -1240,6 +1240,146 @@ def plot_win_draw_loss_by_feature_set(df):
         print(f"  (Total games: {counts.loc[feature_set].sum()})")
         print()
 
+def plot_feature_set_time_comparison(df):
+    """
+    Create a line graph showing average move times for each feature set.
+    X-axis shows the feature sets, Y-axis shows the average move time.
+    """
+    if 'feature_selection' not in df.columns or 'avg_move_times' not in df.columns:
+        print("Required columns 'feature_selection' or 'avg_move_times' not found in dataset")
+        return
+    
+    # Convert feature_selection to string type and ensure avg_move_times is numeric
+    df_copy = df.copy()
+    df_copy['feature_selection'] = df_copy['feature_selection'].astype(str)
+    df_copy['avg_move_times'] = pd.to_numeric(df_copy['avg_move_times'], errors='coerce')
+    
+    # Group by feature_selection and calculate mean move time
+    group = df_copy.groupby('feature_selection')['avg_move_times'].mean().reset_index()
+    
+    # Sort by feature_selection numerically for logical x-axis ordering
+    try:
+        group['feature_selection_numeric'] = pd.to_numeric(group['feature_selection'])
+        group = group.sort_values('feature_selection_numeric')
+    except:
+        # If conversion fails (e.g., non-numeric feature sets), use alphabetical order
+        group = group.sort_values('feature_selection')
+    
+    # Create line plot
+    plt.figure(figsize=(8, 5))
+    plt.plot(group['feature_selection'], group['avg_move_times'], 
+             marker='o', linewidth=2, markersize=8)
+
+    # ...
+    plt.plot(group['feature_selection'], group['avg_move_times'], 
+            marker='o', linewidth=2, markersize=8)
+
+    # Calculate the maximum value so we can push the top of the y-axis a bit higher
+    ymax = group['avg_move_times'].max()
+    plt.ylim(top=ymax + 0.1)  # e.g., add 0.1 to create space above the highest point
+
+    # Add labels and title, etc.
+    plt.xlabel('Feature Set')
+    plt.ylabel('Average Move Time (seconds)')
+    plt.title('Average Move Time by Feature Set')
+
+    # Add data labels above each point
+    for i, row in group.iterrows():
+        plt.text(i, row['avg_move_times'] + 0.01, f"{row['avg_move_times']:.3f}", 
+                ha='center', va='bottom')
+
+    # ...
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.show()
+
+    
+    # # Add labels and title
+    # plt.xlabel('Feature Set')
+    # plt.ylabel('Average Move Time (seconds)')
+    # plt.title('Average Move Time by Feature Set')
+    
+    # # Add data labels above each point
+    # for i, row in group.iterrows():
+    #     plt.text(i, row['avg_move_times'] + 0.01, f"{row['avg_move_times']:.3f}", 
+    #              ha='center', va='bottom')
+    
+    # Print the values for reference
+    print("Average move times by feature set:")
+    for i, row in group.iterrows():
+        print(f"Feature Set {row['feature_selection']}: {row['avg_move_times']:.3f} seconds")
+    
+    # plt.grid(True, linestyle='--', alpha=0.7)
+    # plt.tight_layout()
+    # plt.show()
+
+def plot_feature_set_nodes_comparison(df):
+    """
+    Create a line graph showing average nodes explored for each feature set.
+    X-axis shows the feature sets, Y-axis shows the average nodes explored.
+    """
+    if 'feature_selection' not in df.columns or 'avg_nodes_explored' not in df.columns:
+        print("Required columns 'feature_selection' or 'avg_nodes_explored' not found in dataset")
+        return
+    
+    # Convert feature_selection to string type and ensure avg_nodes_explored is numeric
+    df_copy = df.copy()
+    df_copy['feature_selection'] = df_copy['feature_selection'].astype(str)
+    df_copy['avg_nodes_explored'] = pd.to_numeric(df_copy['avg_nodes_explored'], errors='coerce')
+    
+    # Group by feature_selection and calculate mean nodes explored
+    group = df_copy.groupby('feature_selection')['avg_nodes_explored'].mean().reset_index()
+    
+    # Sort by feature_selection numerically for logical x-axis ordering
+    try:
+        group['feature_selection_numeric'] = pd.to_numeric(group['feature_selection'])
+        group = group.sort_values('feature_selection_numeric')
+    except:
+        # If conversion fails (e.g., non-numeric feature sets), use alphabetical order
+        group = group.sort_values('feature_selection')
+    
+    # Create line plot
+    plt.figure(figsize=(8, 5))
+    plt.plot(group['feature_selection'], group['avg_nodes_explored'], 
+             marker='o', linewidth=2, markersize=8)
+
+        # After creating the line plot:
+    plt.plot(group['feature_selection'], group['avg_nodes_explored'], 
+            marker='o', linewidth=2, markersize=8)
+
+    # Compute the maximum value so we can push the y-limit a bit higher:
+    ymax = group['avg_nodes_explored'].max()
+    plt.ylim(top=ymax + 100)  # Add a margin of 100 above the highest point
+
+    # Instead of adding 50 to y, use a smaller offset:
+    for i, row in group.iterrows():
+        plt.text(i, row['avg_nodes_explored'] + 20,  # smaller offset (20)
+                f"{row['avg_nodes_explored']:.0f}", 
+                ha='center', va='bottom')
+
+    
+    # Add labels and title
+    plt.xlabel('Feature Set')
+    plt.ylabel('Average Nodes Explored')
+    plt.title('Average Nodes Explored by Feature Set')
+    
+    # # Add data labels above each point
+    # for i, row in group.iterrows():
+    #     plt.text(i, row['avg_nodes_explored'] + 50, f"{row['avg_nodes_explored']:.0f}", 
+    #              ha='center', va='bottom')
+    
+    # Print the values for reference
+    print("Average nodes explored by feature set:")
+    for i, row in group.iterrows():
+        print(f"Feature Set {row['feature_selection']}: {row['avg_nodes_explored']:.0f} nodes")
+    
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.show()
+
+
+
+
 
 # -------------------------------------------------------
 # 4) MAIN SCRIPT ENTRY POINT
@@ -1273,13 +1413,13 @@ def main():
 
     # plot_feature_set_comparison_bar_chart(compute_feature_set_metrics(df))   # happy
 
-    # small_metrics = ["Win Rate", "Avg Piece Balance", "Avg Move Time"]
-    # big_metrics = ["Avg Blunder Value", "Avg Mobility"]
-    # metrics = compute_feature_set_metrics(df)
+    small_metrics = ["Avg Piece Balance"]
+    big_metrics = ["Avg Blunder Count", "Avg Mobility"]
+    metrics = compute_feature_set_metrics(df)
 
-    # plot_feature_set_comparison_bar_chart(metrics[small_metrics]) # happy
-    # plot_feature_set_comparison_bar_chart(metrics[big_metrics]) # happy
-    # # Choose eihere one graoh or two graphs
+    plot_feature_set_comparison_bar_chart(metrics[small_metrics]) # happy
+    plot_feature_set_comparison_bar_chart(metrics[big_metrics]) # happy
+    # Choose eihere one graoh or two graphs
 
 
     # plot_win_draw_loss_by_implementation(df) #DONE
@@ -1296,7 +1436,10 @@ def main():
     # plot_avg_move_time_by_phase(df)
     # plot_avg_nodes_explored_by_phase(df)
 
-    plot_win_draw_loss_by_feature_set(df)
+    # plot_win_draw_loss_by_feature_set(df)
+
+    plot_feature_set_time_comparison(df)
+    plot_feature_set_nodes_comparison(df)
 
 
 
