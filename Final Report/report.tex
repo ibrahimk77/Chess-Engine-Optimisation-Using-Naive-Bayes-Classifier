@@ -47,27 +47,22 @@
 
 
 Since the creation of chess over 1500 years ago \cite{davidsonShortHistoryChess2012}, it is widely acknowledged among researchers and players that the most influential moment in chess history was IBM's Deep Blue defeating Kasparov \cite{hsuIBMsDeepBlue1999}, the world champion at the time. This was a turning point for chess engines and AI in general.
-Since then we have seen the rise of chess engines the likes of Stockfish and AlphaZero. Despite our progress in this field, the game is still unsolved. Shannon (1950) mentions that there are $10^{120}$ possible positions in chess \cite{shannonXXIIProgrammingComputer1950} which is more than the number of atoms in the observable universe. Therefore, brute-forcing the game remains infeasible. As a result, since 1997, attempts have been made to create a perfect chess engine. Achieving more efficient approaches to solving chess could provide meaningful insights into other problems in computer science like optimisation and decision-making.
+Since then we have seen the rise of more complex and powerful chess engines the likes of Stockfish and AlphaZero. Despite our progress in this field, the game is still unsolved, not being able to definitively determine the best move in a given position. Shannon (1950) mentions that there are $10^{120}$ possible positions in chess \cite{shannonXXIIProgrammingComputer1950} which is more than the number of atoms in the observable universe. Therefore, brute-forcing the game remains infeasible. As a result, since 1997, attempts have been made to create a perfect chess engine. Achieving more efficient approaches to solving chess could provide meaningful insights into other problems in computer science like optimisation and decision-making.
 
 Machine Learning is at the heart of modern chess engines like AlphaZero and Stockfish.  
 % ??MENTION WHAT IS USED BY STOCKFISH OR ALPHAZERO AND QUOTE???. 
-This project aims to create a chess engine that uses machine learning techniques that are not popular within the chess engine field, to explore the potential of these techniques but also to explore what processes can be shared between different machine learning techniques.
-Chess engines are usually used as a benchmark for advancements in AI, so this project could be a stepping stone for future research. 
+This project aims to create a chess engine that uses machine learning techniques that are not popular within chess engines, to explore the potential of these techniques and their effectiveness. Chess engines are usually used as a benchmark for advancements in AI, so this project could be a stepping stone for future research. 
 
-Minimax, especially when combined with Alpha-Beta pruning, is fundamental to modern chess engines. Alpha-Beta pruning optimises the algorithm by discarding unnecessary branches which decreases the computational demand considerably. Despite this, even optimised minimax algorithms cannot fully explore an entire tree due to exponential growth. This is where machine learning is used to predict optimal moves more efficiently. Many techniques have been used from Neural Networks \cite{kleinNeuralNetworksChess2022} to Natural Language Processing (NLP) \cite{NLPinChess}. 
-% [REFERENCE]. ???GAPS???
+Minimax, especially when combined with Alpha-Beta pruning, is fundamental to modern chess engines. Alpha-Beta pruning optimises the algorithm by discarding unnecessary branches within a game tree which decreases the computational demand considerably. Despite this, even optimised minimax algorithms cannot fully explore an entire tree due to exponential growth. This is where machine learning is used to predict optimal moves more efficiently. Many techniques have been used from Neural Networks \cite{kleinNeuralNetworksChess2022} to Natural Language Processing (NLP) \cite{NLPinChess}. 
 
 This research focuses on how a Naive Bayes Classifier can be implemented in a search algorithm like Minimax to improve positional evaluation in a chess engine. Naive Bayes has proven effective in other contexts like spam detection and due to its simplicity and efficiency, it could be ideal for this application. Popular machine learning algorithms used in chess engines are usually very complex and require a lot of computational power, however, Occam's Razor states that simplicity is usually the best option. This research examines whether this principle holds in this domain. 
 
 Traditional minimax algorithms implement simple evaluation functions, primarily based on material advantage. However, the complexity of chess involves intricacies that are not reflected in the number of pieces alone like piece positioning as well as structural weaknesses. This is where a Naive Bayes classifier could be utilised to try to learn these intricacies better than a standard evaluation function.
 
-The primary objective of this research is to explore the potential of implementing a Naive Bayes Classifier into a minimax based chess engine to improve the evaluation. Specifically, this project investigates if a simpler and more efficient machine learning algorithm reduces complexity but achieves the performance of more complex machine learning techniques. This research will also explore a variety of implementations of the classifier, whether it should fully replace traditional evaluation functions or support them.
+The primary objective of this research is to explore the potential of implementing a Naive Bayes Classifier into a minimax based chess engine to improve the evaluation. Specifically, this project investigates if a simpler and more efficient machine learning algorithm reduces complexity but achieves the performance of more complex machine learning techniques. This research will also explore a variety of implementations of the classifier, whether it should fully replace traditional evaluation functions or be used alongside them.
 
 
 
-
-
-\section{Report Structure}
 
 \include{Chapters/Background}
 \include{Chapters/LiteratureReview}
@@ -77,8 +72,8 @@ The primary objective of this research is to explore the potential of implementi
 % \include{Chapters/Body}
 % \include{Chapters/DesignSpecification}
 % \include{Chapters/Implementation}
-\include{Chapters/ProfessionalIssues}
 \include{Chapters/Results}
+\include{Chapters/ProfessionalIssues}
 \include{Chapters/Conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -89,11 +84,14 @@ The primary objective of this research is to explore the potential of implementi
 \addcontentsline{toc}{section}{Bibliography}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Appendices
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\appendix
-\include{Appendices/appendix}
-\include{Appendices/UserGuide}
-\include{Appendices/SourceCode}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Appendices
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \appendix
+% \include{Appendices/appendix}
+% \include{Appendices/UserGuide}
+% \include{Appendices/SourceCode}
+
+
+
 \end{document}

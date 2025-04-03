@@ -1,5 +1,4 @@
 from joblib import load
-import numpy as np
 import time
 from game import play
 import pandas as pd

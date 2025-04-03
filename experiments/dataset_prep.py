@@ -1,7 +1,6 @@
 from data_prep import preprocess_data
 from training import train 
 import pandas as pd
-import numpy as np
 
 
 
