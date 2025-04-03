@@ -1,59 +1,29 @@
-User Guide
-There are two main components of the codebase:
+# User Guide
 
-Training the Model
+There are two main components of the codebase: one regarding the training of the model and one regarding the playing of chess games.
 
-Playing Chess Games (Experiments)
+Before training, it is important to download the kaggle dataset from the link [https://www.kaggle.com/datasets/arevel/chess-games](https://www.kaggle.com/datasets/arevel/chess-games) and rename it to `chess_games.csv`. It is also important to install all required libraries as listed in the `requirements.txt` file. The main files required for the training of the models are:
 
-Training the Model
-Before training, please follow these steps:
+- **`dataset_prep.py`**: this is the main file to be executed to train the 12 models. This file loads the data, separates the data into three groups, master level games, beginner level games and a random sample of games. For each combination of dataset and feature set, it preprocesses the data by invoking the `preprocess_data` function from `data_prep.py`. It then uses the processed data to train the model using the `train` function from `training.py`. It then saves the evaluation metrics to a CSV file named `eval_results.csv`.
 
-Download the Dataset:
-Download the Kaggle dataset from this link and rename the file to chess_games.csv.
+- **`data_prep.py`**: this file is used to preprocess the data and prepare it for training. It goes through each game in the dataset, simulates the games and extracts features at certain intervals. The `preprocess_data` function returns the processed data, which is then used to train the model.
 
-Install Required Libraries:
-Install all required libraries as listed in the requirements.txt file.
+- **`features.py`**: contains all the methods to extract each feature. It also extracts features based on the feature set selected.
 
-The main files required for training are:
+- **`naive_bayes.py`**: This is the main file for the Naive Bayes model. It contains two main methods `predict` which returns the predicted class for a given set of features and `predict_prob` which returns the probabilities for each class.
 
-dataset_prep.py
-This is the main file to execute to train the 12 models. It loads the data and separates it into three groups (master level games, beginner level games, and a random sample of games). For each combination of dataset and feature set, it preprocesses the data by invoking the preprocess_data function from data_prep.py, trains the model using the train function from training.py, and saves the evaluation metrics to a CSV file named eval_results.csv.
+- **`training.py`**: This file is where the main training occurs. The data is first scaled using the `prepare_data` function. It then splits the data into training and testing data. It invokes the `fit` method from the `naive_bayes.py` file to train the model. It then calculates a number of metrics such as accuracy, precision, recall, kappa and F1 score and returns these metrics. It also saves the models and scalers to joblib files.
 
-data_prep.py
-This file is used to preprocess the data and prepare it for training. It simulates each game in the dataset and extracts features at set intervals. The processed data returned by the preprocess_data function is then used to train the model.
+Before running the experiments, it is important to install Stockfish ideally in the same directory as the `game.py` file. If it is not downloaded in the same directory, make sure to alter the `STOCKFISH_PATH` in the `game.py` file to the path of the Stockfish executable. It can be downloaded from the link [https://stockfishchess.org/download/](https://stockfishchess.org/download/).
 
-features.py
-Contains all the methods for feature extraction. Features are extracted based on the selected feature set.
+The main files required for the running of the experiments are:
 
-naive_bayes.py
-This is the main file for the Naive Bayes model. It contains two primary methods:
+- **`experiments.py`**: this is the main file to be executed to run the experiments. It goes through all combinations of datasets, feature sets, Naive Bayes weightings, opponents and implementations and plays 30 games for each combination. It loads the models from the joblib files as well as the respective scalers. It calls the `play` function from the `game.py` file to play the games. It then saves the results to a CSV file named `game_results.csv`.
 
-predict: Returns the predicted class for a given set of features.
+- **`game.py`**: this is the file where the game is played. In the `play` function, it keeps track of a number of metrics. It creates a new board and chooses a move by the engine based on the `get_alphaBeta_move` function, depending on the implementation selected. It then chooses a move either by a random engine or Stockfish, depending on the opponent selected. It then continues this until the game is over. It then returns the different metrics of the game to be saved in a CSV file.
 
-predict_prob: Returns the probabilities for each class.
+- **`minimax.py`**: this file contains the `alphaBeta` function which implements a normal minimax algorithm with alpha-beta pruning.
 
-training.py
-This file handles the main training process. It first scales the data using the prepare_data function and then splits it into training and testing sets. It trains the model by calling the fit method from naive_bayes.py and then calculates various metrics (such as accuracy, precision, recall, kappa, and F1 score). Finally, it saves the models and scalers as joblib files.
+- **`minimax_NB_integrated.py`**: this file contains the `alphaBeta_integrated` function which includes the implementation of the MMNB integration algorithm.
 
-Playing Chess Games (Experiments)
-Before running the experiments:
-
-Install Stockfish:
-Install Stockfish ideally in the same directory as the game.py file. If it is not in the same directory, update the STOCKFISH_PATH variable in game.py to point to the correct location of the Stockfish executable. Stockfish can be downloaded from here.
-
-The main files required for running experiments are:
-
-experiments.py
-This is the main file to execute to run the experiments. It iterates over all combinations of datasets, feature sets, Naive Bayes weightings, opponents, and implementations, playing 30 games for each combination. It loads the models and scalers from the joblib files, calls the play function from game.py to run each game, and saves the results to a CSV file named game_results.csv.
-
-game.py
-This file contains the code for playing chess games. The play function tracks various metrics, creates a new chess board, and selects moves using the engine based on the get_alphaBeta_move function (which depends on the selected implementation). Moves can be chosen either via a random engine or Stockfish (depending on the chosen opponent). The game continues until completion, and the resulting metrics are saved in a CSV file.
-
-minimax.py
-Contains the alphaBeta function, which implements a standard minimax algorithm with alpha-beta pruning.
-
-minimax_NB_integrated.py
-Contains the alphaBeta_integrated function, which implements the MMNB integration algorithm.
-
-minimax_NB_sub.py
-Contains the alphaBeta_sub function, which implements the MMNB substitution algorithm.
+- **`minimax_NB_sub.py`**: this file contains the `alphaBeta_sub` function which includes the implementation of the MMNB substitution algorithm.
