@@ -27,3 +27,5 @@ The main files required for the running of the experiments are:
 - **`minimax_NB_integrated.py`**: this file contains the `alphaBeta_integrated` function which includes the implementation of the MMNB integration algorithm.
 
 - **`minimax_NB_sub.py`**: this file contains the `alphaBeta_sub` function which includes the implementation of the MMNB substitution algorithm.
+
+- **`chess_visual.py`**: this includes all the methods required for showing the chess board visually. Majority of the code comes from https://www.youtube.com/watch?v=EnYui0e73Rs&list=PLBwF487qi8MGU81nDGaeNE1EnNEPYWKY_&index=1 and the images were obtained from https://drive.google.com/drive/folders/1qH7IQj5lj7o3MQIb5TAZhsDr_5f9p8aq.
