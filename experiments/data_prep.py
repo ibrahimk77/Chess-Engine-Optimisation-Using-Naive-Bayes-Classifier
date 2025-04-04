@@ -5,6 +5,7 @@ from features import board_features
 import time
 
 
+
 def an_to_moves(an):
     moves = re.sub(r"\d+\.", "", an)
     moves = re.sub(r"1-0|0-1|1/2-1/2", "", moves)
