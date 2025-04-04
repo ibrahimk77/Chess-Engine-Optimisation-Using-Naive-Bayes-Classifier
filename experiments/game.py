@@ -4,6 +4,7 @@ import chess.engine
 import time
 import random
 
+from chess_visual import VisualBoard
 
 from minimax import alphaBeta
 from minimax_NB_sub import alphaBeta_sub
@@ -173,7 +174,63 @@ def play(model, scaler, opponent, game_num, implementation, feature, nb_weight=D
     all_stats = phase_stats + [whole_stats]
     return all_stats
 
+def play_game_visual(model, scaler, opponent, implementation, feature, nb_weight=DEFAULT_NB_WEIGHT):
 
+    board = chess.Board()
+    vboard = VisualBoard()
+    vboard.initialise_board()
+    engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
+    engine.configure({"Skill Level": LEVEL})
+    running = True
+    x = True
+
+
+    total_time = 0
+    moves = 0
+
+    white_score = 0
+    black_score = 0
+
+
+    while running:
+        running = vboard.continue_game()
+
+        if not board.is_game_over():
+            if board.turn == chess.WHITE:
+                start = time.time()
+                move = get_alphaBeta_move(board, model, scaler, implementation, True, feature, nb_weight)[1]
+                end = time.time()
+                total_time += end - start
+            
+            else:
+                if opponent == 'random':
+                    move = random.choice(list(board.legal_moves))
+                elif opponent == 'stockfish':
+                    result = engine.play(board, chess.engine.Limit(time=STOCKFISH_TIME))
+                    move = result.move
+                else:
+                    _, move, _ = get_alphaBeta_move(board, model, scaler, implementation, False, feature, nb_weight)
+
+            if move:
+                board.push(move)
+                vboard.drawGame(board)
+                analysis = engine.analyse(board, chess.engine.Limit(time=0.1))
+                score = analysis['score']
+                if not score.is_mate():
+                    if moves % 2 == 0:
+                        white_score += score.relative.score()
+                    else:
+                        black_score -= score.relative.score()
+                moves += 1
+                    
+        
+        elif x:
+            x = False
+            print(board.result())
+            print(f"Average time taken for each move: {total_time/moves}")
+            print(f"White score: {white_score/(moves/2)}")
+            print("Total moves: ", moves)
+    engine.quit()
 
 
 def get_alphaBeta_move(board, model, scaler, implementation, is_white, feature, nb_weight):
@@ -188,3 +245,6 @@ def get_alphaBeta_move(board, model, scaler, implementation, is_white, feature, 
         confidence, move, nodes_explored = alphaBeta(board, -float("inf"), float("inf"), DEPTH, True)
 
     return confidence, move, nodes_explored
+
+
+play_game_visual(None, None, 'stockfish', 'default', 0, 0.5)

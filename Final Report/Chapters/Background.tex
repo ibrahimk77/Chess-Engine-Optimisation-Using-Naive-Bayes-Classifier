@@ -9,7 +9,7 @@ Modern chess is a game that has its origins in India, dating back to the 6th cen
 
 The defeat of Garry Kasparov against IBM's Deep Blue marked a major turning point, demonstrating the effectiveness of search algorithms in chess and accelerating research into more sophisticated search algorithms and evaluation techniques. Search algorithms are important in chess engines as they systematically explore potential future moves, allowing the chess engine to determine the most optimal move. Commonly used is what is known as minimax. The concept of minimax was first proposed by Shannon in 1950 \cite{shannonXXIIProgrammingComputer1950}.
 % [REFERENCE]
-It is used for zero-sum games which are games where if one player wins, the other player loses. The algorithm recursively alternates between the maximising player and the minimising player, until it reaches a leaf node. Then the algorithm backtracks to identify the most favourable moves for each player. The algorithm is shown below \cite{russellArtificialIntelligenceModern2022}:
+It is used for zero-sum games which are games where if one player wins, the other player loses. The algorithm recursively alternates between the maximising player and the minimising player, until it reaches a leaf node. Then the minimax algorithm backtracks to identify the most favourable moves for each player. The algorithm is shown below \cite{russellArtificialIntelligenceModern2022}:
 
 
 \begin{algorithm}[h]
@@ -35,9 +35,10 @@ It is used for zero-sum games which are games where if one player wins, the othe
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
+
 The issue with this algorithm is that the search tree it creates grows exponentially, so techniques to decrease the search space are used. Alpha-Beta pruning is one such technique that is used to reduce the number of nodes that need to be explored. It does this by ignoring nodes that would not affect the final outcome of the algorithm. It introduces two new values, ${\alpha}$ and ${\beta}$, where ${\alpha}$ represents the maximum value that can be attained and ${\beta}$ represents the minimum value that can be attained. If the value of a node is less than ${\alpha}$ or greater than ${\beta}$, then the node is pruned. In the best case scenario, the algorithm only needs to evaluate ${O(b^{d/2})}$ nodes \cite{russellArtificialIntelligenceModern2022}, where ${b}$ is the branching factor and ${d}$ is the depth of the tree compared to ${O(b^d)}$ nodes with normal minimax. However, in the worst-case scenario it doesn't help improve minimax at all. Since alpha-beta pruning always returns the same value as minimax and is much faster, it is always used over minimax alone.
 
-However, even with alpha-beta pruning, the search space for chess is still too large to evaluate in a reasonable amount of time.  This is why a Heuristic Alpha-Beta Tree Search is used, which is where the search is cut off early and applies a heuristic evaluation function to estimate which player is in the winning position. In chess engines what is usually used for this evaluation function is calculating the material balance, where each piece is given a value and the player with the higher value is currently "winning".
+However, even with alpha-beta pruning, the search tree for chess is still too large to evaluate in a reasonable amount of time.  This is why a Heuristic Alpha-Beta Tree Search is used, which is where the search is cut off early and applies a heuristic evaluation function to estimate which player is in the winning position. In chess engines what is usually used for this evaluation function is calculating the material balance, where each piece is given a value and the player with the higher value is currently "winning".
 
 The way to improve minimax-based chess engines is one of two ways. The first is to increase the depth of the search tree, however this is generally dependent on the computational power of the machine so over time as computational power increases (if Moore's Law still holds) the depth of the search tree can increase. The second way is to improve the evaluation function, which is what this research paper focuses on. The primary way this is done is by using machine learning techniques. 
 
@@ -77,7 +78,7 @@ Where:
     \item $N$: Total number of instances
 \end{itemize}
 
-After calculating the priors for each class, the likelihoods of each feature need to be calculated. There are two main types of Naive Bayes classifiers, Multinomial and Gaussian. Multinomial Naive Bayes is primary used for situations where the features used are discrete which calculates the likelihood based on the count of each feature.
+After calculating the priors for each class, the likelihoods of each feature need to be calculated. There are two main types of Naive Bayes classifiers. The first is Multinomial Naive Bayes which is primarily used for situations where the features used are discrete which calculates the likelihood based on the count of each feature.
 
 \begin{equation}
     \label{eq:multinomial}
@@ -107,7 +108,7 @@ Where:
     \item $\mu$: Mean of the feature
 \end{itemize}
 
-The posterior probability for a class given a set of features $X_1, X_2,..., X_n $ is calculated using Bayes' theorem. Since Naive Bayes assumes that the features are conditionally independent given the class, allows the equation to be simplified to the product of the likelihoods \cite{lowdNaiveBayesModels2005}.
+The posterior probability for a class given a set of features is calculated using Bayes' theorem. Since Naive Bayes assumes that the features are conditionally independent given the class, allows the equation to be simplified to the product of the likelihoods \cite{lowdNaiveBayesModels2005}.
 
 \begin{equation}
     \label{eq:posterior}
